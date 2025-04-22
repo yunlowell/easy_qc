@@ -3,6 +3,7 @@
 flutter 카메라 기능 확인용
 
 #Git 으로 받고 나서 실행하는 법
+
 1.flutter_inspection 폴더로 이동
 
 2. flutter pub get
