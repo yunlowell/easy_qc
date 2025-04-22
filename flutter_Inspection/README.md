@@ -1,16 +1,11 @@
 # flutter_inspection_app
 
-A new Flutter project.
+flutter 카메라 기능 확인용
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+#Git 으로 받고 나서 실행하는 법
+1.flutter_inspection 폴더로 이동
+2. flutter pub get
+3. flutter create .     <- 중요
+   - 이 명령어는 pubspec.yaml 파일을 기반으로 ios, android 폴더를 생성합니다.
+   - ios, android 폴더가 없으면 실행이 안됩니다.
+4. flutter run
