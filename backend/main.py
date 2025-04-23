@@ -3,8 +3,14 @@ from fastapi import FastAPI, Request, Depends
 from fastapi.responses import RedirectResponse
 from dotenv import load_dotenv
 import httpx
+import firebase_admin
+from firebase_admin import credentials, auth
 
 load_dotenv()
+
+# Firebase Admin 초기화
+cred = credentials.Certificate(os.getenv("FIREBASE_KEY_PATH"))
+firebase_admin.initialize_app(cred)
 
 app = FastAPI()
 
@@ -52,14 +58,32 @@ async def google_callback(request: Request):
         access_token = token_json.get("access_token")
 
         # access_token으로 사용자 정보 가져오기
-        user_info_url = "https://www.googleapis.com/oauth2/v2/userinfo"
-        headers = {"Authorization": f"Bearer {access_token}"}
-        user_info_res = await client.get(user_info_url, headers=headers)
-        user_info = user_info_res.json()
+        user_info_res = await client.get(
+            "https://www.googleapis.com/oauth2/v2/userinfo",
+            headers={"Authorization": f"Bearer {access_token}"}
+        )
+        user = user_info_res.json()
+
+    # Firebase에 유저 생성 or 확인
+    try:
+        firebase_user = auth.get_user_by_email(user["email"])
+    except auth.UserNotFoundError:
+        firebase_user = auth.create_user(
+            uid=user["id"],
+            email=user["email"],
+            display_name=user["name"],
+            photo_url=user["picture"],
+        )
+
+    # Firebase Custom Token 생성
+    custom_token = auth.create_custom_token(firebase_user.uid)
 
     return {
-        "google_id": user_info["id"],
-        "email": user_info["email"],
-        "name": user_info["name"],
-        "picture": user_info["picture"]
+        "firebase_token": custom_token.decode("utf-8"),
+        "user": {
+            "uid": firebase_user.uid,
+            "email": firebase_user.email,
+            "display_name": firebase_user.display_name,
+            "photo_url": firebase_user.photo_url,
+        }
     }
