@@ -397,4 +397,6 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+# firebase
+firebase_key.json
 # End of https://www.toptal.com/developers/gitignore/api/python,images,flutter,kotlin,macos,windows,venv
