@@ -35,7 +35,7 @@ class LoginActivity : AppCompatActivity() {
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
                             // 로그인 성공 -> MainActivity로 이동
-                            val intent = Intent(this, MainActivity::class.java)
+                            val intent = Intent(this, HomeActivity::class.java)
                             startActivity(intent)
                             finish()
                         } else {

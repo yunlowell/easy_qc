@@ -7,8 +7,18 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/main"
         tools:context=".LoginActivity"
-        android:padding="24dp">
+        android:background="@color/white"
+        android:gravity="center_vertical"
+        android:padding="40dp">
 
+        <ImageView
+            android:layout_width="181dp"
+            android:layout_height="241dp"
+            android:layout_gravity="center"
+            android:paddingTop="10dp"
+            android:src="@drawable/easyqc_logo">
+
+        </ImageView>
         <EditText
             android:id="@+id/emailEditText"
             android:layout_width="match_parent"
@@ -29,6 +39,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="로그인"
+            android:backgroundTint="@color/deepblue"
             android:layout_marginTop="24dp" />
 
 </LinearLayout>
