@@ -196,7 +196,7 @@ __pycache__/
 *$py.class
 
 # C extensions
-*.so
+#*.so   //khcha 필요함.
 
 # Distribution / packaging
 .Python
