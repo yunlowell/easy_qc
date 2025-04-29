@@ -398,3 +398,6 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.toptal.com/developers/gitignore/api/python,images,flutter,kotlin,macos,windows,venv
+.gitignore.back
+flutter_ex/android/java_pid33504.hprof
+/flutter_Inspection
