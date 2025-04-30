@@ -28,22 +28,31 @@
         android:theme="@style/Theme.Easyqc3"
         tools:targetApi="31">
         <activity
+            android:name=".HistoryActivity"
+            android:exported="true" />
+        <activity
+            android:name=".StandardActivity"
+            android:exported="true" />
+        <activity
             android:name=".HomeActivity"
-            android:exported="false" />
+            android:exported="true">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+
+        </activity>
+
+
         <activity
             android:name=".LoginActivity"
             android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
+
+
         <activity
             android:name=".MainActivity"
             android:exported="true">
-
-            <!-- 여기는 앱 최초 실행화면이 LoginActivity니까 intent-filter 안 넣어도 됨 -->
         </activity>
     </application>
 
