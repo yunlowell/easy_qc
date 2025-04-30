@@ -67,7 +67,9 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     implementation(platform(libs.firebase.bom))
-    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.firebase:firebase-auth-ktx") // firebase 인증 관련
+    implementation(platform("com.google.firebase:firebase-bom:33.12.0")) // firebase database 관련
+    implementation("com.google.firebase:firebase-database") // firebase database 관련
 
     implementation(libs.opencv)
     implementation("org.jetbrains.kotlin:kotlin-stdlib:2.0.0")
