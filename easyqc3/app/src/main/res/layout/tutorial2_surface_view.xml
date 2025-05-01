@@ -18,12 +18,12 @@
         android:padding="8dp"
         android:layout_gravity="top|end">
 
-        <Button
+<!--        <Button
             android:id="@+id/btn1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="RGB" />
-
+-->
         <Button
             android:id="@+id/btn2"
             android:layout_width="wrap_content"
@@ -40,7 +40,7 @@
             android:id="@+id/btn4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="ETC" />
+            android:text="Calibration" />
 
     </LinearLayout>
 
