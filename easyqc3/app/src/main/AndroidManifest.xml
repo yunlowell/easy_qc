@@ -25,8 +25,9 @@
         android:icon="@mipmap/easyqc_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/easyqc_launcher_round"
-        android:supportsRtl="true"
         android:theme="@style/Theme.Easyqc3"
+        android:supportsRtl="true"
+
         tools:targetApi="31">
         <activity
             android:name=".StandardActivity"
@@ -36,23 +37,20 @@
             android:exported="true" />
         <activity
             android:name=".HomeActivity"
-            android:exported="true">
+            android:exported="true" />
+        <activity
+            android:name=".MainActivity"
+            android:exported="true" />
 
-        </activity>
         <activity
             android:name=".LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".MainActivity"
-            android:exported="true">
 
-        </activity>
     </application>
 
 </manifest>

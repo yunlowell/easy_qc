@@ -6,4 +6,9 @@
     </style>
 
     <style name="Theme.Easyqc3" parent="Base.Theme.Easyqc3" />
+
+    <style name="Theme.ActionBar" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- ActionBar가 있는 테마 사용 -->
+    </style>
+
 </resources>

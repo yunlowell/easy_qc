@@ -94,6 +94,13 @@ import org.opencv.core.CvType
 import org.opencv.core.Mat
 import org.opencv.imgproc.Imgproc
 
+import androidx.appcompat.app.AppCompatActivity;
+
+
+import android.view.SurfaceView
+import android.widget.Button
+
+
 class MainActivity : CameraActivity(), CvCameraViewListener2 {
 
     companion object {
@@ -121,6 +128,12 @@ class MainActivity : CameraActivity(), CvCameraViewListener2 {
         Log.i(TAG, "Instantiated new ${this::class.java}")
     }
 
+    //// 버튼 ID 참조용
+    private lateinit var btnRGB: Button
+    private lateinit var btnGRAY: Button
+    private lateinit var btnCANNY: Button
+    private lateinit var btnCameraCalibration: Button
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.i(TAG, "called onCreate")
@@ -143,6 +156,30 @@ class MainActivity : CameraActivity(), CvCameraViewListener2 {
         mOpenCvCameraView = findViewById(R.id.tutorial2_activity_surface_view)
         mOpenCvCameraView?.visibility = CameraBridgeViewBase.VISIBLE
         mOpenCvCameraView?.setCvCameraViewListener(this)
+
+
+        btnRGB = this.findViewById(R.id.btn1);
+        btnRGB.setOnClickListener {
+            this.mViewMode = VIEW_MODE_RGBA
+            Toast.makeText(this, "RGBA 모드", Toast.LENGTH_SHORT).show()
+        }
+
+        btnGRAY= this.findViewById(R.id.btn2);
+        btnGRAY.setOnClickListener {
+            this.mViewMode = VIEW_MODE_GRAY
+            Toast.makeText(this, "GRAY 모드", Toast.LENGTH_SHORT).show()
+        }
+        btnCANNY=this.findViewById(R.id.btn3);
+        btnCANNY.setOnClickListener {
+            this.mViewMode = VIEW_MODE_CANNY
+            Toast.makeText(this, "CANNY 모드", Toast.LENGTH_SHORT).show()
+        }
+        btnCameraCalibration=this.findViewById(R.id.btn4);
+        btnCameraCalibration.setOnClickListener {
+
+            Toast.makeText(this, "Camera Calibration", Toast.LENGTH_SHORT).show()
+        }
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -176,6 +213,8 @@ class MainActivity : CameraActivity(), CvCameraViewListener2 {
     override fun onResume() {
         super.onResume()
         mOpenCvCameraView?.enableView()
+
+        invalidateOptionsMenu(); // 메뉴 갱신 요청
     }
 
     override fun onDestroy() {
