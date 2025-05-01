@@ -34,7 +34,8 @@ class LoginActivity : AppCompatActivity() {
                 auth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
-                            // 로그인 성공 -> MainActivity로 이동
+                            // 로그인 성공 -> HomeActivity로 이동
+                            Toast.makeText(this, "로그인 성공", Toast.LENGTH_SHORT).show()
                             val intent = Intent(this, HomeActivity::class.java)
                             startActivity(intent)
                             finish()
