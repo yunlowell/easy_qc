@@ -7,11 +7,8 @@ function HomePage() {
         <div style={styles.container}>
             <h2 style={styles.title}>홈</h2>
             <div style={styles.menuContainer}>
-                <button style={styles.menuButton} onClick={() => navigate('/measure')}>
-                    계측 시작
-                </button>
                 <button style={styles.menuButton} onClick={() => navigate('/setting')}>
-                    기준값 설정
+                    측정 값 설정
                 </button>
                 <button style={styles.menuButton} onClick={() => navigate('/history')}>
                     계측 히스토리

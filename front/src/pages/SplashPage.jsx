@@ -7,7 +7,7 @@ function SplashPage() {
     useEffect(() => {
         const timer = setTimeout(() => {
             navigate('/login');
-        }, 2000); // 2초 후 이동
+        }, 3000); // 3초 후 이동
 
         return () => clearTimeout(timer); // 컴포넌트 unmount 시 타이머 제거
     }, [navigate]);
