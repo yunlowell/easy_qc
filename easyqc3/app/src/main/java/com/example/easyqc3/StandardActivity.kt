@@ -14,8 +14,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 
 data class MeasurementSetting(
-    val referenceLength: String,
-    val tolerance: String,
+    val referenceLength: Double,
+    val tolerance: Double,
     val unit: String
 )
 
@@ -44,11 +44,11 @@ class StandardActivity : AppCompatActivity() {
             val userId = user.uid // 현재 로그인한 사용자의 uid
 
             setSendButton.setOnClickListener {
-                val referenceLength = setReferenceLength.text.toString()
-                val tolerance = setTolerance.text.toString()
+                val referenceLength = setReferenceLength.text.toString().toDoubleOrNull()
+                val tolerance = setTolerance.text.toString().toDoubleOrNull()
                 val unit = setUnit.text.toString()
 
-                if (referenceLength.isEmpty() || tolerance.isEmpty() || unit.isEmpty()) {
+                if (referenceLength == null || tolerance == null || unit.isEmpty()) {
                     Toast.makeText(this, "필수 값을 입력해 주세요.", Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 }
