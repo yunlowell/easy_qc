@@ -1,15 +1,17 @@
-// This sample is based on "Camera calibration With OpenCV" tutorial:
-// https://docs.opencv.org/4.x/d4/d94/tutorial_camera_calibration.html
-//
-// It uses standard OpenCV asymmetric circles grid pattern 11x4:
-// https://github.com/opencv/opencv/blob/4.x/doc/acircles_pattern.png
-// The results are the camera matrix and 5 distortion coefficients.
-//
-// Tap on highlighted pattern to capture pattern corners for calibration.
-// Move pattern along the whole screen and capture data.
-//
-// When you've captured necessary amount of pattern corners (usually ~20 are enough),
-// press "Calibrate" button for performing camera calibration.
+/*
+ This sample is based on "Camera calibration With OpenCV" tutorial:
+ https://docs.opencv.org/4.x/d4/d94/tutorial_camera_calibration.html
+
+ It uses standard OpenCV asymmetric circles grid pattern 11x4:
+ https://github.com/opencv/opencv/blob/4.x/doc/acircles_pattern.png
+ The results are the camera matrix and 5 distortion coefficients.
+
+ Tap on highlighted pattern to capture pattern corners for calibration.
+ Move pattern along the whole screen and capture data.
+
+ When you've captured necessary amount of pattern corners (usually ~20 are enough),
+ press "Calibrate" button for performing camera calibration.
+*/
 
 package com.example.easyqc3;
 
@@ -26,7 +28,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuItem;
+//import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.View;
@@ -41,7 +43,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class CameraCalibrationActivity extends CameraActivity implements CvCameraViewListener2, OnTouchListener {
-    private static final String TAG = "OCVSample::Activity";
+    private static final String TAG = "CameraCalibrationActivity";
 
     private CameraBridgeViewBase mOpenCvCameraView;
     private CameraCalibrator mCalibrator;
