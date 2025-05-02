@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.WindowManager
+import android.widget.Button
 import android.widget.Toast
 import org.opencv.android.CameraActivity
 import org.opencv.android.CameraBridgeViewBase
@@ -14,9 +15,12 @@ import org.opencv.android.CameraBridgeViewBase.CvCameraViewListener2
 import org.opencv.android.OpenCVLoader
 import org.opencv.core.CvType
 import org.opencv.core.Mat
+import org.opencv.core.MatOfPoint
+import org.opencv.core.MatOfPoint2f
+import org.opencv.core.Point
+import org.opencv.core.Scalar
+import org.opencv.core.Size
 import org.opencv.imgproc.Imgproc
-
-import android.widget.Button
 
 
 class MainActivity : CameraActivity(), CvCameraViewListener2 {
@@ -171,6 +175,11 @@ class MainActivity : CameraActivity(), CvCameraViewListener2 {
                 mRgba = inputFrame.rgba()
                 Imgproc.Canny(inputFrame.gray(), mIntermediateMat, 80.0, 100.0)
                 Imgproc.cvtColor(mIntermediateMat, mRgba, Imgproc.COLOR_GRAY2RGBA, 4)
+
+                // 측정 함수 호출
+                val pixelPerMM = 4.2 // 기준 물체로 미리 측정해둔 값
+                detectAndMeasureRectangle(mIntermediateMat, mRgba, pixelPerMM);
+
                 mRgba
             }
             VIEW_MODE_FEATURES -> {
@@ -186,4 +195,60 @@ class MainActivity : CameraActivity(), CvCameraViewListener2 {
     }
 
     external fun FindFeatures(matAddrGr: Long, matAddrRgba: Long)
+
+    //추출된 contours 중에서 가장큰 사각형을 찾아서 표시한다.
+    private fun detectAndMeasureRectangle(edgeMat: Mat, outputRgbaMat: Mat, pixelPerMM: Double) {
+        // 1. 윤곽선 검출
+        val contours: List<MatOfPoint> = ArrayList()
+        val hierarchy = Mat()
+        Imgproc.findContours(
+            edgeMat.clone(), contours, hierarchy,
+            Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE
+        )
+
+        // 2. 가장 큰 사각형 찾기
+        var maxArea = 0.0
+        var biggest: MatOfPoint? = null
+        for (contour in contours) {
+            val area = Imgproc.contourArea(contour)
+            if (area > maxArea) {
+                maxArea = area
+                biggest = contour
+            }
+        }
+
+        if (biggest != null) {
+            // 3. 최소 외접 사각형 추출
+            val box = Imgproc.minAreaRect(MatOfPoint2f(*biggest.toArray()))
+            val size: Size = box.size
+            val widthPx: Double = size.width
+            val heightPx: Double = size.height
+
+            // 4. 픽셀 → mm 변환
+            val widthMM = widthPx / pixelPerMM
+            val heightMM = heightPx / pixelPerMM
+
+            Log.i("MEASURE", String.format("Width: %.2f mm, Height: %.2f mm", widthMM, heightMM))
+
+            // 5. 사각형 시각화
+            val boxPoints: Array<Point?> = arrayOfNulls<Point>(4)
+            box.points(boxPoints)
+            for (i in 0..3) {
+                Imgproc.line(
+                    outputRgbaMat,
+                    boxPoints[i], boxPoints[(i + 1) % 4], Scalar(0.0, 255.0, 0.0), 2
+                )
+            }
+
+            // 6. 측정값 표시 (선택)
+            Imgproc.putText(
+                outputRgbaMat,
+                String.format("%.1fmm x %.1fmm", widthMM, heightMM),
+                box.center,
+                Imgproc.FONT_HERSHEY_SIMPLEX, 0.8, Scalar(255.0, 0.0, 0.0), 2
+            )
+        }
+    }
+
+
 }

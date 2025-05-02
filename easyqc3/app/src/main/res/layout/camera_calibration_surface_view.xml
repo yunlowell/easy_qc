@@ -23,7 +23,18 @@
             android:layout_height="wrap_content"
             android:text="Calibration Save" />
 
-
+        <TextView
+            android:id="@+id/tv_corner_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="샘플 수: 0"
+            android:textSize="18sp"
+            android:textColor="#FFFFFF"
+            android:background="#80000000"
+            android:padding="8dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true"
+            android:layout_margin="16dp"/>
 
     </LinearLayout>
 

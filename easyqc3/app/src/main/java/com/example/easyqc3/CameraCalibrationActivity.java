@@ -32,6 +32,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.WindowManager;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import android.widget.Button;
@@ -51,6 +52,7 @@ public class CameraCalibrationActivity extends CameraActivity implements CvCamer
 
     //// 버튼 ID 참조용
     private Button btnCalibrationSave;
+    private TextView tvCornerCount;
 
     public CameraCalibrationActivity() {
         Log.i(TAG, "Instantiated new " + this.getClass());
@@ -76,6 +78,8 @@ public class CameraCalibrationActivity extends CameraActivity implements CvCamer
         mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.camera_calibration_java_surface_view);
         mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
         mOpenCvCameraView.setCvCameraViewListener(this);
+
+        tvCornerCount = findViewById(R.id.tv_corner_count);
 
         btnCalibrationSave = findViewById(R.id.btn_calibration_save);
         btnCalibrationSave.setOnClickListener(new View.OnClickListener() {
@@ -176,7 +180,7 @@ public class CameraCalibrationActivity extends CameraActivity implements CvCamer
         }
         return true;
     }
-
+/*
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.calibration) {
@@ -242,6 +246,7 @@ public class CameraCalibrationActivity extends CameraActivity implements CvCamer
             return super.onOptionsItemSelected(item);
         }
     }
+*/
 
     public void onCameraViewStarted(int width, int height) {
         if (mWidth != width || mHeight != height) {
@@ -272,6 +277,11 @@ public class CameraCalibrationActivity extends CameraActivity implements CvCamer
         Log.d(TAG, "onTouch invoked");
 
         mCalibrator.addCorners();
+
+        // 샘플 수 화면에 표시
+        int count = mCalibrator.getCornersBufferSize();
+        tvCornerCount.setText("샘플 수: " + count);
+
         return false;
     }
 }
