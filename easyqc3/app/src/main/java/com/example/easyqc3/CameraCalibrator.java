@@ -37,10 +37,10 @@ public class CameraCalibrator {
     public CameraCalibrator(int width, int height) {
         mImageSize = new Size(width, height);
         mFlags = Calib3d.CALIB_FIX_PRINCIPAL_POINT +
-                 Calib3d.CALIB_ZERO_TANGENT_DIST +
-                 Calib3d.CALIB_FIX_ASPECT_RATIO +
-                 Calib3d.CALIB_FIX_K4 +
-                 Calib3d.CALIB_FIX_K5;
+                Calib3d.CALIB_ZERO_TANGENT_DIST +
+                Calib3d.CALIB_FIX_ASPECT_RATIO +
+                Calib3d.CALIB_FIX_K4 +
+                Calib3d.CALIB_FIX_K5;
         Mat.eye(3, 3, CvType.CV_64FC1).copyTo(mCameraMatrix);
         mCameraMatrix.put(0, 0, 1.0);
         Mat.zeros(5, 1, CvType.CV_64FC1).copyTo(mDistortionCoefficients);
@@ -97,7 +97,7 @@ public class CameraCalibrator {
     }
 
     private double computeReprojectionErrors(List<Mat> objectPoints,
-            List<Mat> rvecs, List<Mat> tvecs, Mat perViewErrors) {
+                                             List<Mat> rvecs, List<Mat> tvecs, Mat perViewErrors) {
         MatOfPoint2f cornersProjected = new MatOfPoint2f();
         double totalError = 0;
         double error;
