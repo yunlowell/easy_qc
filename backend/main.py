@@ -3,6 +3,7 @@ import firebase_admin
 from fastapi import FastAPI, HTTPException, Request, Body, Depends
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel, EmailStr
+from predict import router as predict_router
 from typing import Dict
 from dotenv import load_dotenv
 from passlib.context import CryptContext
@@ -18,12 +19,13 @@ load_dotenv()
 
 app = FastAPI()
 
+app.include_router(predict_router)
+
 # Firebase Admin 초기화 및 연결
 cred = credentials.Certificate(os.getenv("FIREBASE_KEY_PATH"))
 firebase_admin.initialize_app(cred)
 
 db = firestore.client()
-
 
 
 # 구글 로그인에 필요한 환경변수 설정
@@ -276,3 +278,7 @@ def login(user: UserLogin):
     access_token = create_access_token(data={"sub": user.email})
 
     return {"access_token": access_token, "token_type": "bearer"}
+
+@app.get("/")
+def root():
+    return {"message": "Defect Prediction API running"}

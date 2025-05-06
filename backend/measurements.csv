@@ -1,0 +1,101 @@
+id,referenceLength,tolerance,measurementUnit,measuredValue,userId,measurementDateTime,imageThumbnail,defectReason,measurementLocation,result
+1615fa23-98b7-4eb8-8950-7ff832cafb3b,50.63,1.64,mm,52.9,user_3,2025-05-06T15:48:49.631344,https://example.com/image/0.jpg,기준 초과,라인-2,합격
+26f12660-1792-4a24-8a57-8ee01cfd16a4,50.17,1.08,mm,58.31,user_1,2025-05-06T15:38:49.631363,https://example.com/image/1.jpg,,,합격
+88488f5c-0c3e-464c-aae5-5fea6c7dc38e,58.59,1.48,mm,57.23,user_4,2025-05-06T15:28:49.631369,https://example.com/image/2.jpg,기준 초과,,불량
+4d872c29-5c9e-4a37-a83b-176d3a10e110,54.48,1.91,mm,56.33,user_4,2025-05-06T15:18:49.631373,https://example.com/image/3.jpg,기준 초과,,합격
+df6a21a4-8638-4ccb-95f3-0060bf5e0c31,56.5,1.96,mm,55.67,user_3,2025-05-06T15:08:49.631377,https://example.com/image/4.jpg,기준 초과,,합격
+cbc2f192-5842-45e0-9b83-57a028639566,52.89,1.01,mm,54.69,user_1,2025-05-06T14:58:49.631381,https://example.com/image/5.jpg,기준 초과,라인-1,합격
+f518a280-cb89-4b7a-afbc-c4713e570ee1,54.63,1.32,mm,51.77,user_3,2025-05-06T14:48:49.631384,https://example.com/image/6.jpg,,,불량
+14893f46-d7c6-4ec4-a605-5c121ffbc7d6,54.79,1.46,mm,55.99,user_3,2025-05-06T14:38:49.631389,https://example.com/image/7.jpg,,,합격
+c148588e-5259-4213-9197-1ea65c0ab352,59.22,1.58,mm,54.83,user_1,2025-05-06T14:28:49.631394,https://example.com/image/8.jpg,,,불량
+8756bcce-5637-40e4-99cf-a9678ec17787,53.19,1.76,mm,53.51,user_2,2025-05-06T14:18:49.631399,https://example.com/image/9.jpg,,,합격
+cea2cc58-d28d-4a17-82c6-7a00481d2f9c,57.41,1.8,mm,55.59,user_3,2025-05-06T14:08:49.631405,https://example.com/image/10.jpg,,,불량
+21544956-7a99-4ad0-accf-f6073e3ed4d7,50.59,0.92,mm,58.95,user_2,2025-05-06T13:58:49.631412,https://example.com/image/11.jpg,,라인-1,합격
+6a9e9f5f-65b4-49cb-9ff1-516680f7c95d,52.92,1.3,mm,53.29,user_1,2025-05-06T13:48:49.631419,https://example.com/image/12.jpg,,,합격
+2eb932f8-5afa-48ea-be5f-b3cce68b328f,50.21,1.32,mm,56.37,user_1,2025-05-06T13:38:49.631425,https://example.com/image/13.jpg,,,합격
+3f0df029-ed7b-43f8-8f32-df2fca006139,59.02,1.29,mm,54.68,user_2,2025-05-06T13:28:49.631432,https://example.com/image/14.jpg,,,불량
+6f1f6d85-077b-418c-9f2f-0d7c580dc17a,58.77,1.07,mm,58.08,user_2,2025-05-06T13:18:49.631437,https://example.com/image/15.jpg,,,불량
+45999388-0e43-45b2-8ba6-60a9d6c956e1,54.07,1.41,mm,52.05,user_2,2025-05-06T13:08:49.631443,https://example.com/image/16.jpg,,,불량
+23fa093b-cc78-4873-b366-21ddfa331564,55.39,1.4,mm,55.74,user_4,2025-05-06T12:58:49.631450,https://example.com/image/17.jpg,기준 초과,,합격
+82e5843b-8f2f-4916-9eee-0cd62bf93a90,55.4,1.76,mm,52.01,user_1,2025-05-06T12:48:49.631457,https://example.com/image/18.jpg,기준 초과,라인-1,불량
+7f661e1b-26d3-4218-90e3-980dc5bad1d7,54.48,0.57,mm,55.32,user_4,2025-05-06T12:38:49.631463,https://example.com/image/19.jpg,,,합격
+757b566e-252f-4662-9b08-3f3886378185,54.48,0.84,mm,57.74,user_4,2025-05-06T12:28:49.631470,https://example.com/image/20.jpg,,,합격
+faced100-2e50-4645-bbc2-73a812db6d17,58.77,0.76,mm,57.42,user_4,2025-05-06T12:18:49.631477,https://example.com/image/21.jpg,기준 초과,,불량
+3b8e1586-7b53-4461-9de6-7be78c202807,52.04,1.74,mm,58.57,user_4,2025-05-06T12:08:49.631484,https://example.com/image/22.jpg,,,합격
+98d09f45-f071-4b1d-8f72-8aa1545ef87c,52.89,1.68,mm,54.72,user_1,2025-05-06T11:58:49.631491,https://example.com/image/23.jpg,,,합격
+d5735195-aec2-4e8f-be26-a195c2beddad,54.16,0.68,mm,54.31,user_4,2025-05-06T11:48:49.631497,https://example.com/image/24.jpg,기준 초과,,합격
+1dccbffd-459a-49cd-b96b-e2a51a18645d,59.47,1.84,mm,55.53,user_3,2025-05-06T11:38:49.631504,https://example.com/image/25.jpg,기준 초과,라인-3,불량
+8a5680cf-469d-4d0c-8a4e-91f44d4e85b5,52.93,1.74,mm,59.23,user_1,2025-05-06T11:28:49.631512,https://example.com/image/26.jpg,기준 초과,라인-1,합격
+deeb7043-d3c6-43fe-a7e3-47b60143bfd1,51.7,0.9,mm,51.66,user_4,2025-05-06T11:18:49.631519,https://example.com/image/27.jpg,,라인-2,합격
+debc9a4d-98d2-4e6e-86c5-f66d506fe365,58.65,0.78,mm,57.41,user_4,2025-05-06T11:08:49.631526,https://example.com/image/28.jpg,,,불량
+ea17daaa-bb7b-4824-b1c5-6a978b1dd77a,58.57,1.48,mm,57.05,user_3,2025-05-06T10:58:49.631540,https://example.com/image/29.jpg,,,불량
+b249f591-b3c5-4820-8e38-08dafdb72da6,58.27,1.09,mm,50.0,user_2,2025-05-06T10:48:49.631543,https://example.com/image/30.jpg,,,불량
+077fc62a-1e86-4d10-abce-aa835277e177,53.91,1.15,mm,50.14,user_1,2025-05-06T10:38:49.631547,https://example.com/image/31.jpg,기준 초과,라인-1,불량
+379ce802-ce74-4b43-9e8c-85a5f2e47c35,59.03,1.0,mm,60.92,user_1,2025-05-06T10:28:49.631551,https://example.com/image/32.jpg,,,합격
+12b42c56-8512-4589-a567-19f4abfc92ce,52.27,1.64,mm,53.85,user_1,2025-05-06T10:18:49.631555,https://example.com/image/33.jpg,기준 초과,,합격
+b6c667b6-5e94-4ef3-833a-f19e193c66f5,55.89,1.75,mm,59.2,user_1,2025-05-06T10:08:49.631558,https://example.com/image/34.jpg,기준 초과,라인-2,합격
+8c866cc1-bbc3-447d-aa8c-c9c85178123c,57.81,1.11,mm,53.68,user_4,2025-05-06T09:58:49.631562,https://example.com/image/35.jpg,,라인-1,불량
+59891f84-1c8c-4473-b129-f994198596f0,51.2,1.65,mm,51.89,user_3,2025-05-06T09:48:49.631566,https://example.com/image/36.jpg,기준 초과,,합격
+a2dbdfd0-3d5e-41f1-ac14-acf8239cb154,50.47,1.14,mm,55.0,user_3,2025-05-06T09:38:49.631570,https://example.com/image/37.jpg,,,합격
+65ab8ae7-2841-47bb-9e43-c733b0b8cb07,55.01,1.66,mm,49.59,user_1,2025-05-06T09:28:49.631573,https://example.com/image/38.jpg,기준 초과,,불량
+148380b4-f399-4191-a14a-1f1a9102bac9,53.25,1.94,mm,49.94,user_3,2025-05-06T09:18:49.631577,https://example.com/image/39.jpg,,라인-2,불량
+d48911c9-0ac3-4993-99da-e7be306860bb,59.78,1.97,mm,51.69,user_4,2025-05-06T09:08:49.631581,https://example.com/image/40.jpg,,라인-1,불량
+1f407d04-0d26-42fa-83dc-36047c064fef,55.46,0.97,mm,53.29,user_3,2025-05-06T08:58:49.631585,https://example.com/image/41.jpg,,,불량
+9b2988b7-4db8-4773-b4a6-0950fd41a533,53.59,1.37,mm,56.4,user_4,2025-05-06T08:48:49.631590,https://example.com/image/42.jpg,,,합격
+2fe650d4-124e-4511-87ae-2b481a6be8b5,55.14,1.38,mm,53.33,user_3,2025-05-06T08:38:49.631596,https://example.com/image/43.jpg,,라인-3,불량
+b00b63d0-e91e-4a3e-af35-7efbddf3f9fc,58.96,0.95,mm,50.97,user_1,2025-05-06T08:28:49.631603,https://example.com/image/44.jpg,,라인-2,불량
+667b1102-0370-43d3-857c-6be78d766b66,53.21,1.1,mm,52.0,user_2,2025-05-06T08:18:49.631609,https://example.com/image/45.jpg,,,불량
+051f8d5a-c35b-4c0b-a1e2-3ad717a96e51,53.74,0.63,mm,57.77,user_4,2025-05-06T08:08:49.631615,https://example.com/image/46.jpg,,,합격
+a878cddf-4279-41f7-ba7e-97ea506f7f0f,53.6,1.79,mm,52.49,user_3,2025-05-06T07:58:49.631620,https://example.com/image/47.jpg,기준 초과,라인-3,불량
+96d561bd-72a9-4c53-9b1a-0de57cb6bfef,54.43,1.67,mm,54.41,user_2,2025-05-06T07:48:49.631626,https://example.com/image/48.jpg,,,합격
+093dffc3-7b9f-428f-a535-01f7de6ce89b,53.51,1.15,mm,53.76,user_3,2025-05-06T07:38:49.631632,https://example.com/image/49.jpg,,라인-3,합격
+3406d3c4-b77e-4ca6-8c2b-849f22dbd1f7,57.35,1.2,mm,49.97,user_3,2025-05-06T07:28:49.631638,https://example.com/image/50.jpg,기준 초과,,불량
+fb2daf20-2a3b-4aaa-8ad3-c6c72b51ecfd,59.3,1.73,mm,56.3,user_2,2025-05-06T07:18:49.631644,https://example.com/image/51.jpg,,라인-3,불량
+7c4ea216-0c54-4341-b850-c964c09121dd,56.49,1.29,mm,57.5,user_1,2025-05-06T07:08:49.631650,https://example.com/image/52.jpg,,라인-3,합격
+e0d04e1b-6fa6-460f-8207-366303cc1bfd,54.33,1.01,mm,57.37,user_4,2025-05-06T06:58:49.631657,https://example.com/image/53.jpg,,,합격
+2c1fea62-feda-4e61-9e38-610621dec9b0,52.72,1.79,mm,52.42,user_2,2025-05-06T06:48:49.631663,https://example.com/image/54.jpg,,라인-1,합격
+52201561-32b8-45c4-b953-4af93c492f89,59.91,0.6,mm,59.44,user_2,2025-05-06T06:38:49.631669,https://example.com/image/55.jpg,,,불량
+029ee145-1964-4ef9-8d5f-76ebe2cfbcdb,53.93,1.72,mm,49.4,user_2,2025-05-06T06:28:49.631675,https://example.com/image/56.jpg,,라인-2,불량
+31720747-8fd0-44ea-bbfe-194f2bd9bf3d,53.02,0.82,mm,51.98,user_2,2025-05-06T06:18:49.631681,https://example.com/image/57.jpg,,,불량
+52f69ccf-62f7-42c8-b571-f8b0dd156ca0,57.85,0.85,mm,54.93,user_1,2025-05-06T06:08:49.631687,https://example.com/image/58.jpg,,라인-2,불량
+e1bcc49c-6539-4a11-a9bb-ad5b5494adea,58.15,0.88,mm,54.09,user_1,2025-05-06T05:58:49.631693,https://example.com/image/59.jpg,,,불량
+eb34a4a6-e7bb-4770-9c10-f85878e6e2de,56.56,0.9,mm,58.75,user_4,2025-05-06T05:48:49.631700,https://example.com/image/60.jpg,,,합격
+7eb33a95-cb88-46f1-97f7-b60d9cd128dd,52.75,1.82,mm,60.16,user_3,2025-05-06T05:38:49.631707,https://example.com/image/61.jpg,,,합격
+17d43b4a-926a-4e31-ad34-5a44a69fbfe8,56.79,0.98,mm,55.13,user_2,2025-05-06T05:28:49.631714,https://example.com/image/62.jpg,기준 초과,라인-2,불량
+df0a5c25-9db9-4965-9abd-a70a57ccbc72,57.21,0.65,mm,55.47,user_1,2025-05-06T05:18:49.631721,https://example.com/image/63.jpg,,,불량
+f3189fd1-a750-4701-be3a-0d34efeb2bad,59.52,0.92,mm,52.86,user_4,2025-05-06T05:08:49.631727,https://example.com/image/64.jpg,,,불량
+976318ba-ab77-47bb-b929-2e0887ae5cf6,56.63,1.6,mm,49.64,user_1,2025-05-06T04:58:49.631734,https://example.com/image/65.jpg,,라인-3,불량
+1e3e9f35-11a9-4884-8cba-04aa46e70ba6,58.05,1.92,mm,53.59,user_3,2025-05-06T04:48:49.631741,https://example.com/image/66.jpg,,,불량
+f34bf230-a25b-4c67-b48f-9db053b61872,50.48,1.74,mm,56.82,user_2,2025-05-06T04:38:49.631748,https://example.com/image/67.jpg,,라인-1,합격
+31a90ab3-862d-4875-8246-65e8ee608fe1,52.42,1.47,mm,56.25,user_3,2025-05-06T04:28:49.631754,https://example.com/image/68.jpg,기준 초과,라인-1,합격
+2462350b-be11-46df-9d05-1a67ca18765c,56.12,1.72,mm,50.46,user_1,2025-05-06T04:18:49.631760,https://example.com/image/69.jpg,,,불량
+59ecb84d-2897-4ea4-9d80-0169ce9d9b9b,50.48,1.4,mm,49.3,user_1,2025-05-06T04:08:49.631766,https://example.com/image/70.jpg,,,불량
+95dfa18c-80c6-4be2-91e6-d9931360f1ec,58.17,1.91,mm,58.08,user_4,2025-05-06T03:58:49.631773,https://example.com/image/71.jpg,,,합격
+567031c5-69e7-43d1-b9ca-043f1e52ab2d,54.76,1.66,mm,57.86,user_3,2025-05-06T03:48:49.631779,https://example.com/image/72.jpg,,,합격
+bb4b38d3-ade6-4ed8-80db-279b9c56da8d,57.59,1.11,mm,50.94,user_4,2025-05-06T03:38:49.631786,https://example.com/image/73.jpg,기준 초과,,불량
+23d4a0df-fea9-4e06-a1da-c77d74dd8477,59.03,0.65,mm,51.07,user_3,2025-05-06T03:28:49.631792,https://example.com/image/74.jpg,,라인-1,불량
+a13bfc22-43d5-4eae-a0c5-74b247bbc06c,59.64,1.49,mm,57.93,user_3,2025-05-06T03:18:49.631798,https://example.com/image/75.jpg,기준 초과,,불량
+0c84c425-fc3c-477d-b0d5-d37d805fe554,55.37,1.9,mm,55.33,user_1,2025-05-06T03:08:49.631805,https://example.com/image/76.jpg,,,합격
+85be394e-0966-4484-8a43-6baac4560ba1,57.78,0.55,mm,50.26,user_2,2025-05-06T02:58:49.631812,https://example.com/image/77.jpg,,,불량
+fdce8d24-a86a-42c2-9ff7-697ea8c191cc,58.06,0.72,mm,51.12,user_1,2025-05-06T02:48:49.631819,https://example.com/image/78.jpg,,,불량
+e36494fd-ca55-462b-a295-a1cb5c716176,53.51,0.79,mm,55.24,user_3,2025-05-06T02:38:49.631826,https://example.com/image/79.jpg,기준 초과,,합격
+0435becc-52ca-4a8a-976c-8195af7a457d,53.92,1.59,mm,51.91,user_4,2025-05-06T02:28:49.631833,https://example.com/image/80.jpg,,,불량
+c822f3b1-4ace-427d-8c40-6a51ec09c29e,53.63,1.99,mm,49.46,user_4,2025-05-06T02:18:49.631839,https://example.com/image/81.jpg,,,불량
+0c15bfc2-58ba-4e34-afd1-70d3b1087c8b,58.1,1.09,mm,51.33,user_2,2025-05-06T02:08:49.631846,https://example.com/image/82.jpg,,,불량
+8e542bd3-5fb5-4d8e-aee0-47b6d4093eab,54.47,0.92,mm,52.15,user_4,2025-05-06T01:58:49.631852,https://example.com/image/83.jpg,기준 초과,,불량
+29890a1c-96c5-47fd-86ea-c0f0012821df,51.24,1.03,mm,60.43,user_1,2025-05-06T01:48:49.631859,https://example.com/image/84.jpg,,라인-3,합격
+d1ec8a13-8325-41d5-9e58-311ae48be6f4,56.45,1.39,mm,52.09,user_1,2025-05-06T01:38:49.631865,https://example.com/image/85.jpg,기준 초과,라인-1,불량
+15d0539e-e812-4407-b2c8-22c248074c85,56.27,0.78,mm,52.52,user_2,2025-05-06T01:28:49.631872,https://example.com/image/86.jpg,,,불량
+50b954cb-1d89-4f4e-9cb9-1f084ffb94d8,58.51,1.87,mm,58.57,user_3,2025-05-06T01:18:49.631878,https://example.com/image/87.jpg,기준 초과,,합격
+41cb928e-0533-4a14-adcd-9e875d5d2e84,57.44,0.61,mm,58.4,user_2,2025-05-06T01:08:49.631885,https://example.com/image/88.jpg,,,합격
+101c728d-c89f-4578-b037-30f189bdf395,54.65,1.4,mm,58.83,user_3,2025-05-06T00:58:49.631892,https://example.com/image/89.jpg,,,합격
+8ee2f2a1-fa5b-4397-9a44-ee92ca11d822,50.68,1.56,mm,58.37,user_4,2025-05-06T00:48:49.631899,https://example.com/image/90.jpg,,라인-1,합격
+b3cc5179-95e6-404b-a1a6-11302e9772bb,52.36,0.64,mm,60.85,user_4,2025-05-06T00:38:49.631906,https://example.com/image/91.jpg,,,합격
+4b3cda81-7e28-4600-8a98-a51c708efc76,57.74,1.27,mm,60.28,user_3,2025-05-06T00:28:49.631912,https://example.com/image/92.jpg,,,합격
+cb91be9d-39a1-4b8d-b567-38d3078f78a7,54.68,1.5,mm,56.85,user_2,2025-05-06T00:18:49.631921,https://example.com/image/93.jpg,기준 초과,,합격
+95ca8e99-ac60-4d96-b852-ef238df08c96,57.86,0.98,mm,53.92,user_4,2025-05-06T00:08:49.631927,https://example.com/image/94.jpg,기준 초과,,불량
+210f1f7e-2e20-459a-92db-392fe6ca4f6f,53.94,1.26,mm,51.79,user_4,2025-05-05T23:58:49.631939,https://example.com/image/95.jpg,,라인-3,불량
+e14ceb0f-8380-4e6e-8f71-519cc4b72a24,55.9,1.76,mm,59.85,user_3,2025-05-05T23:48:49.631945,https://example.com/image/96.jpg,,,합격
+75edf3c8-df2c-4b80-93db-d5c81e2fd81e,51.3,0.65,mm,57.25,user_4,2025-05-05T23:38:49.631951,https://example.com/image/97.jpg,,,합격
+34b4112b-8a1f-44de-826b-221f60378f0f,50.97,0.9,mm,49.95,user_2,2025-05-05T23:28:49.631957,https://example.com/image/98.jpg,,라인-3,불량
+d2af6770-e85a-433a-a9b9-ecd77190caa6,53.97,1.67,mm,59.73,user_2,2025-05-05T23:18:49.631964,https://example.com/image/99.jpg,,,합격
