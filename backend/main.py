@@ -102,6 +102,17 @@ async def google_callback(request: Request):
     # Firebase Custom Token 생성
     custom_token = auth.create_custom_token(firebase_user.uid)
 
+    doc_ref = db.collection("users").document(user["email"])
+    doc_ref.set({
+        "email": user["email"],
+        "displayName": user.get("name", ""),
+        "photoUrl": user.get("picture", ""),
+        "uid": user["id"],
+        "loginType": "google",
+        "verified": True,
+        "lastLoginAt": firestore.SERVER_TIMESTAMP
+    }, merge=True)
+
     return {
         "firebase_token": custom_token.decode("utf-8"),
         "user": {
