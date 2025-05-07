@@ -397,8 +397,9 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+# firebase
+firebase_key.json
+
+# google-services
+google-services.json
 # End of https://www.toptal.com/developers/gitignore/api/python,images,flutter,kotlin,macos,windows,venv
-.gitignore.back
-flutter_ex/android/java_pid33504.hprof
-/flutter_Inspection
-easyqc3/app/src/main/java/com/example/easyqc3/MainActivity.java - 복사본.bak
