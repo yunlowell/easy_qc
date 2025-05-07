@@ -1,81 +1,70 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import googleLogo from '../assets/google_logo.png';
 
 function LoginPage() {
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
 
-        // 추후 API 연동 시 사용
-        if (email && password) {
-            // 로그인 시 홈으로 이동
-            navigate('/home');
-        } else {
-            alert('이메일과 비밀번호를 입력해주세요.');
+        try {
+            const response = await fetch('http://localhost:8000/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                localStorage.setItem('token', data.access_token);
+                alert('로그인 성공');
+                navigate('/home');
+            } else {
+                alert(data.detail || '로그인 실패');
+            }
+        } catch (err) {
+            console.error(err);
+            alert('서버 오류');
         }
+    };
+
+    const handleGoogleLogin = () => {
+        const redirectURL = encodeURIComponent('http://localhost:3000/auth/google/callback');
+        window.location.href = 'http://localhost:8000/auth/google/login?redirect=http://localhost:3000/auth/google/callback';
+
     };
 
     return (
         <div style={styles.container}>
-            <h2 style={styles.title}>로그인</h2>
+            <h2>로그인</h2>
             <form onSubmit={handleLogin} style={styles.form}>
-                <input
-                    type="email"
-                    placeholder="이메일"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    style={styles.input}
-                />
-                <input
-                    type="password"
-                    placeholder="비밀번호"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    style={styles.input}
-                />
+                <input type="email" placeholder="이메일" value={email} onChange={(e) => setEmail(e.target.value)} style={styles.input} />
+                <input type="password" placeholder="비밀번호" value={password} onChange={(e) => setPassword(e.target.value)} style={styles.input} />
                 <button type="submit" style={styles.button}>로그인</button>
             </form>
+
+            <div style={styles.googleLogin}>
+                <button style={styles.googleButton} onClick={handleGoogleLogin}>
+                    <img src={googleLogo} alt="google" style={styles.googleIcon} />
+                    google 로그인
+                </button>
+            </div>
         </div>
     );
 }
 
 const styles = {
-    container: {
-        height: '100vh',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#f4f4f4',
-    },
-    title: {
-        fontSize: '2rem',
-        marginBottom: '1rem',
-    },
-    form: {
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '1rem',
-        width: '300px',
-    },
-    input: {
-        padding: '10px',
-        fontSize: '1rem',
-        borderRadius: '5px',
-        border: '1px solid #ccc',
-    },
-    button: {
-        padding: '10px',
-        fontSize: '1rem',
-        backgroundColor: '#007bff',
-        color: 'white',
-        border: 'none',
-        borderRadius: '5px',
-        cursor: 'pointer',
-    },
+    container: { padding: '40px', textAlign: 'center' },
+    form: { display: 'flex', flexDirection: 'column', gap: '10px', width: '300px', margin: '0 auto' },
+    input: { padding: '10px' },
+    button: { padding: '10px', backgroundColor: '#007bff', color: 'white', border: 'none' },
+    googleLogin: { marginTop: '20px' },
+    googleButton: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', padding: '10px', border: '1px solid #ccc' },
+    googleIcon: { width: '20px', height: '20px' },
 };
 
 export default LoginPage;
