@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "707712191669",
+    "project_id": "kt-easyqc",
+    "storage_bucket": "kt-easyqc.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:707712191669:android:a1ab8f20e5bc7c19afc2fc",
+        "android_client_info": {
+          "package_name": "com.example.easyqc3"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDR6v8CGMlglllo95cZgpgDelWVCo3r-Yk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

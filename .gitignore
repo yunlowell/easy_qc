@@ -196,7 +196,7 @@ __pycache__/
 *$py.class
 
 # C extensions
-*.so
+#*.so   //khcha 필요함.
 
 # Distribution / packaging
 .Python
@@ -399,4 +399,7 @@ $RECYCLE.BIN/
 
 # firebase
 firebase_key.json
+
+# google-services
+google-services.json
 # End of https://www.toptal.com/developers/gitignore/api/python,images,flutter,kotlin,macos,windows,venv
