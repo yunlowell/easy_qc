@@ -12,7 +12,7 @@
 
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_marginTop="70dp"
+            android:layout_marginTop="200dp"
             android:layout_height="150dp">
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -174,36 +174,30 @@
 
     </LinearLayout>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="130dp">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/homeRecyclerView"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:clipToPadding="false"
-            android:paddingBottom="20dp"
-            android:paddingTop="120dp"
-            tools:listitem="@layout/item_simplehistory">
+        <ImageView
+            android:id="@+id/gotoHistoryBtn"
+            android:layout_width="match_parent"
+            android:layout_height="130dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:scaleType="fitXY"
+            android:src="@drawable/select_box" />
 
-        </androidx.recyclerview.widget.RecyclerView>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="히스토리 확인"
+            android:textColor="@android:color/black"
+            android:textSize="23sp"
+            android:fontFamily="sans-serif"
+            android:textStyle="bold"/>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-    <ImageView
-        android:id="@+id/gotoHistoryBtn"
-        android:layout_width="70dp"
-        android:layout_height="40dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:scaleType="fitXY"
-        android:src="@drawable/select_box" />
+    </FrameLayout>
 
 </LinearLayout>
 

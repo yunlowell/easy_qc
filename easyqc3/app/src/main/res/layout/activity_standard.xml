@@ -97,16 +97,12 @@
             android:textSize="23sp">
         </TextView>
 
-        <EditText
+        <Spinner
             android:id="@+id/setUnit"
             android:layout_width="271dp"
             android:layout_height="0dp"
-            android:layout_marginStart="0dp"
-            android:layout_marginTop="0dp"
             android:layout_weight="1"
-            android:gravity="center"
-            android:background="@drawable/select_box"
-            android:hint="ex) mm, cm " />
+            android:background="@drawable/select_box"></Spinner>
 
         <TextView
             android:layout_width="match_parent"
