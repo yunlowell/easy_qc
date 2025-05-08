@@ -78,7 +78,7 @@ def google_login(request: Request):
 @app.get("/auth/google/callback")
 async def google_callback(request: Request):
     code = request.query_params.get("code")
-    redirect_frontend_url = request.query_params.get("state")
+    redirect_frontend_url = request.query_params.get("state") or "http://localhost:3000/#/auth/google/callback"
     if not code:
         return {"error": "No code provided"}
 
@@ -128,10 +128,8 @@ async def google_callback(request: Request):
         "lastLoginAt": firestore.SERVER_TIMESTAMP
     }, merge=True)
 
-    parsed = urlparse(redirect_frontend_url)
-    base = parsed.scheme + "://" + parsed.netloc + parsed.path
-    fragment = parsed.fragment or "auth/google/callback"
-    redirect_url = f"{base}#{fragment}?firebase_token={custom_token.decode('utf-8')}"
+    redirect_url = f"{redirect_frontend_url}?firebase_token={custom_token.decode('utf-8')}"
+    print("[DEBUG] Redirecting to:", redirect_url)
     return RedirectResponse(url=redirect_url)
 
 
