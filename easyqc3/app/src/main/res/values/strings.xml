@@ -23,4 +23,6 @@
     <string name="original">Original</string>
     <string name="undistorted">Undistorted</string>
 
+    <string name="googleLogin"><u>구글 연동 로그인</u></string>
+
 </resources>

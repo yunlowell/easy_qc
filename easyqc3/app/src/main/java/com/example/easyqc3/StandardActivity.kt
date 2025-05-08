@@ -2,14 +2,17 @@ package com.example.easyqc3
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.Spinner
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.easyqc3.databinding.ActivityStandardBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 
@@ -23,7 +26,7 @@ class StandardActivity : AppCompatActivity() {
 
     private lateinit var setReferenceLength : EditText
     private lateinit var setTolerance : EditText
-    private lateinit var setUnit : EditText
+    private lateinit var setUnit : Spinner
     private lateinit var setSendButton: Button
     private lateinit var auth: FirebaseAuth
 
@@ -36,17 +39,24 @@ class StandardActivity : AppCompatActivity() {
 
         setReferenceLength = findViewById<EditText>(R.id.setReferenceLength)
         setTolerance = findViewById<EditText>(R.id.setTolerance)
-        setUnit = findViewById<EditText>(R.id.setUnit)
+        setUnit = findViewById<Spinner>(R.id.setUnit)
         setSendButton = findViewById<Button>(R.id.setSendButton)
 
         val user = auth.currentUser
+
+        setUnit.adapter = ArrayAdapter.createFromResource(
+            this,
+            R.array.units,
+            android.R.layout.simple_list_item_1
+        )
+
         if (user != null) {
             val userId = user.uid // 현재 로그인한 사용자의 uid
 
             setSendButton.setOnClickListener {
                 val referenceLength = setReferenceLength.text.toString().toDoubleOrNull()
                 val tolerance = setTolerance.text.toString().toDoubleOrNull()
-                val unit = setUnit.text.toString()
+                val unit = setUnit.selectedItem.toString()
 
                 if (referenceLength == null || tolerance == null || unit.isEmpty()) {
                     Toast.makeText(this, "필수 값을 입력해 주세요.", Toast.LENGTH_SHORT).show()

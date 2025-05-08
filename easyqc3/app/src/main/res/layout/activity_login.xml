@@ -42,5 +42,15 @@
             android:backgroundTint="@color/deepblue"
             android:layout_marginTop="24dp" />
 
+        <TextView
+            android:id="@+id/googleLoginText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/googleLogin"
+            android:textStyle="bold"
+            android:clickable="true"
+            android:layout_marginTop="5dp" />
+
 </LinearLayout>
 

@@ -70,6 +70,10 @@ dependencies {
     implementation("com.google.firebase:firebase-auth-ktx") // firebase 인증 관련
     implementation(platform("com.google.firebase:firebase-bom:33.12.0")) // firebase database 관련
     implementation("com.google.firebase:firebase-database") // firebase database 관련
+    implementation ("androidx.browser:browser:1.8.0") // customtab 사용 라이브러리
+
+    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.8.1")
 
     implementation(libs.opencv)
     implementation("org.jetbrains.kotlin:kotlin-stdlib:2.0.0")

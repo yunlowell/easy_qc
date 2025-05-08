@@ -27,6 +27,7 @@
         android:roundIcon="@mipmap/easyqc_launcher_round"
         android:theme="@style/Theme.Easyqc3"
         android:supportsRtl="true"
+        android:usesCleartextTraffic="true"
 
         tools:targetApi="31">
         <activity
