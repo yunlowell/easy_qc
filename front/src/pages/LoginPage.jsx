@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { HashRouter as Router } from 'react-router-dom';
 import googleLogo from '../assets/google_logo.png';
 
 function LoginPage() {
@@ -33,9 +34,8 @@ function LoginPage() {
     };
 
     const handleGoogleLogin = () => {
-        const redirectURL = encodeURIComponent('http://localhost:3000/auth/google/callback');
-        window.location.href = 'http://localhost:8000/auth/google/login?redirect=http://localhost:3000/auth/google/callback';
-
+        const redirectURL = encodeURIComponent('http://localhost:3000/#/auth/google/callback');
+        window.location.href = `http://localhost:8000/auth/google/login?redirect=${redirectURL}`;
     };
 
     return (
