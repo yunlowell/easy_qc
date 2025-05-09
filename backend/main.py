@@ -295,8 +295,8 @@ def login(user: UserLogin):
 
     # Token 생성
     access_token = create_access_token(data={"sub": user.email})
-
-    return {"access_token": access_token, "token_type": "bearer"}
+    user_id = user_data.get("uid")
+    return {"access_token": access_token, "token_type": "bearer", "user_id": user_id}
 
 @app.get("/")
 def root():
