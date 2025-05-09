@@ -21,6 +21,7 @@ import com.example.easyqc3.network.LoginResponse
 import retrofit2.Call
 import retrofit2.Response
 import android.util.Log;
+import com.google.firebase.auth.FirebaseAuth
 import okhttp3.ResponseBody
 import retrofit2.Callback
 
@@ -44,7 +45,9 @@ class LoginActivity : AppCompatActivity() {
             val password = passwordEditText.text.toString()
 
             if (email.isNotEmpty() && password.isNotEmpty()) {
-                loginApiUser(email, password)
+                // demoLogin 쓸 때 아래 함수 주석, 서버 로그인 쓸 때, demoLogin 함수 주석
+                // loginApiUser(email, password)
+                demoLogin(email, password)
 
                 // 구글 로그인 연동 코드는 나중에.....
 
@@ -90,11 +93,10 @@ class LoginActivity : AppCompatActivity() {
                         // 저장된 email 로그 확인 (디버깅 용)
                         Log.d("LoginActivity", "저장된 email: ${sharedPrefs.getString("email", "없음")}")
 
-                        // 로그인 성공 후 화면 전환
                         Toast.makeText(this@LoginActivity, "로그인 성공!", Toast.LENGTH_SHORT).show()
                         val intent = Intent(this@LoginActivity, HomeActivity::class.java)
                         startActivity(intent)
-                        finish()  // LoginActivity 종료
+                        finish()
                     } else {
                         Toast.makeText(this@LoginActivity, "응답 데이터가 null입니다.", Toast.LENGTH_SHORT)
                             .show()
@@ -114,6 +116,32 @@ class LoginActivity : AppCompatActivity() {
             }
 
         })
+    }
+
+    private fun demoLogin(email: String, password: String){
+        FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val user = FirebaseAuth.getInstance().currentUser
+
+                    Toast.makeText(this, "로그인 성공!", Toast.LENGTH_SHORT).show()
+
+                    val sharedPrefs = getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+                    with(sharedPrefs.edit()) {
+                        putString("email", email)
+                        apply()  // apply()는 비동기적으로 저장이 이루어짐
+                    }
+
+                    Log.d("Login", "demo 저장된 이메일: $email")
+
+                    val intent = Intent(this, HomeActivity::class.java)
+                    startActivity(intent)
+                    finish()
+
+                } else {
+                    Toast.makeText(this, "로그인 실패: ${task.exception}", Toast.LENGTH_SHORT).show()
+                }
+            }
     }
 
 }

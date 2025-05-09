@@ -63,6 +63,7 @@ dependencies {
     implementation(libs.androidx.annotation)
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.firebase.auth.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -70,6 +71,7 @@ dependencies {
     implementation ("androidx.browser:browser:1.8.0") // customtab 사용 라이브러리
     implementation ("com.google.firebase:firebase-firestore-ktx:25.0.0") // firestore 관련
     implementation (platform("com.google.firebase:firebase-bom:33.12.0")) // db관리용
+    implementation("com.google.firebase:firebase-auth") // authentication, demo 계정용
 
     implementation ("com.squareup.retrofit2:retrofit:2.9.0")
     implementation ("com.squareup.retrofit2:converter-gson:2.8.1")
