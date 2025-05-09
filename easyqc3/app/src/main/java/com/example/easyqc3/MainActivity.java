@@ -26,11 +26,15 @@ import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
+import org.opencv.objdetect.ArucoDetector;
+import org.opencv.objdetect.Dictionary;
+
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
 
 import static java.lang.Math.abs;
 import static java.lang.Math.hypot;
@@ -79,6 +83,9 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
     private RotatedRect trackedRect = null;
     private static final double TRACK_DIST_THRESH = 80.0;       // 추적 허용 거리
     private static final double TRACK_SIZE_RATIO = 0.3;         // 추적 허용 크기비율
+
+    private double mScaleH_pixelPerMM = 0.0; // 세로 스케일 (px/mm)
+    private double mScaleW_pixelPerMM = 0.0; // 가로 스케일 (px/mm)
 
     // 사용자가 터치한 커스텀 중심 좌표
     private Point customCenter = null;
@@ -185,6 +192,9 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
         mRgba = new Mat(height, width, CvType.CV_8UC4);       // 컬러 프레임
         mIntermediateMat = new Mat(height, width, CvType.CV_8UC4); // 중간처리용
         mGray = new Mat(height, width, CvType.CV_8UC1);       // 그레이스케일
+
+        // 카메라 calibration 데이터 로드
+        loadCameraCalibration(width, height);
     }
 
     /** 카메라 뷰 종료 시 처리 */
@@ -201,11 +211,22 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
         switch (mViewMode) {
             case VIEW_MODE_GRAY:
                 Imgproc.cvtColor(inputFrame.gray(), mRgba, Imgproc.COLOR_GRAY2RGBA, 4);
+
                 return mRgba;
             case VIEW_MODE_RGBA:
                 return inputFrame.rgba();
             case VIEW_MODE_CANNY:
                 mRgba = inputFrame.rgba();
+
+                List<Mat> corners = new ArrayList<>();
+                Mat ids = new Mat();
+                Mat gray = new Mat();
+                Imgproc.cvtColor(mRgba, gray, Imgproc.COLOR_RGBA2GRAY);
+
+                // 마커 감지
+                detector.detectMarkers(gray, corners, ids);
+                Log.i("Aruco", "감지된 마커 수: " + ids.rows());
+
                 Imgproc.Canny(inputFrame.gray(), mIntermediateMat, 80.0, 100.0);
                 Imgproc.cvtColor(mIntermediateMat, mRgba, Imgproc.COLOR_GRAY2RGBA, 4);
                 if (mDetectAble) {
@@ -214,6 +235,7 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
 
                     if(mDrawTouchCircle) drawTouchFeedback(mRgba); // 사용자 터치 피드백 그리기
                 }
+                detectArucoAndEstimateScale(mRgba, corners, ids);
                 return mRgba;
             case VIEW_MODE_FEATURES:
                 mRgba = inputFrame.rgba();
@@ -306,8 +328,8 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
         RotatedRect bestTracked = trackRectangle2(candidates);
 
         if (bestTracked != null) {
-            double widthMM = bestTracked.size.width / pixelPerMM;
-            double heightMM = bestTracked.size.height / pixelPerMM;
+            double widthMM = bestTracked.size.width / mScaleW_pixelPerMM;   //pixelPerMM;
+            double heightMM = bestTracked.size.height / mScaleH_pixelPerMM; //pixelPerMM;
 
             // 사각형을 선으로 표시
             Point[] points = new Point[4];
@@ -497,5 +519,67 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
             drawTouchCircle(frame, customCenter);
         }
     }
+
+    // ArUco 기반 카메라 보정 및 포즈 추정 기반 실측 측정 코드 추가
+// 카메라 내부 행렬 및 왜곡 계수 (보정된 파일에서 로드)
+    private Mat cameraMatrix = new Mat();
+    private Mat distCoeffs = new Mat();
+    private ArucoDetector detector = new ArucoDetector();
+    private double arucoMarkerLengthMM = 50.0; // 사용된 ArUco 마커의 실제 한 변 길이 (mm)
+
+    private int mWidth=0, mHeight=0;
+    private CameraCalibrator mCalibrator;
+    /**
+     * 캘리브레이션 데이터 로드
+     */
+    private void loadCameraCalibration(int width, int height) {
+        if (mWidth != width || mHeight != height) {
+            mWidth = width;
+            mHeight = height;
+            mCalibrator = new CameraCalibrator(mWidth, mHeight);
+            if (CalibrationResult.tryLoad(this, mCalibrator.getCameraMatrix(), mCalibrator.getDistortionCoefficients())) {
+                mCalibrator.setCalibrated();
+            }
+
+            //mOnCameraFrameRender = new OnCameraFrameRender(new CalibrationFrameRender(mCalibrator));
+        }
+    }
+
+    /**
+     * ArUco 마커를 이용하여 기울어짐을 보정한 가로/세로 별 스케일(px/mm) 계산
+     */
+    private void detectArucoAndEstimateScale(Mat inputMat, List<Mat> corners, Mat ids) {
+
+        if (ids.total() > 0 && corners.size() > 0) {
+            for (int i = 0; i < ids.rows(); i++) {
+                Mat corner = corners.get(i);
+                if (corner.cols() < 4) continue;
+
+                Point p0 = new Point(corner.get(0, 0));
+                Point p1 = new Point(corner.get(0, 1));
+                Point p2 = new Point(corner.get(0, 2));
+                Point p3 = new Point(corner.get(0, 3));
+
+                double width1 = Math.hypot(p0.x - p1.x, p0.y - p1.y);
+                double width2 = Math.hypot(p2.x - p3.x, p2.y - p3.y);
+                double height1 = Math.hypot(p1.x - p2.x, p1.y - p2.y);
+                double height2 = Math.hypot(p3.x - p0.x, p3.y - p0.y);
+
+                double avgWidth = (width1 + width2) / 2.0;
+                double avgHeight = (height1 + height2) / 2.0;
+
+                mScaleW_pixelPerMM = avgWidth / arucoMarkerLengthMM;
+                mScaleH_pixelPerMM = avgHeight / arucoMarkerLengthMM;
+
+                Imgproc.putText(inputMat, String.format("ScaleW: %.2f px/mm", mScaleW_pixelPerMM),
+                        new Point(30, 90 + i * 40), Imgproc.FONT_HERSHEY_SIMPLEX, 0.6, new Scalar(0, 255, 0), 2);
+                Imgproc.putText(inputMat, String.format("ScaleH: %.2f px/mm", mScaleH_pixelPerMM),
+                        new Point(30, 110 + i * 40), Imgproc.FONT_HERSHEY_SIMPLEX, 0.6, new Scalar(0, 255, 0), 2);
+            }
+        }
+    }
+
+
+
 
 }
