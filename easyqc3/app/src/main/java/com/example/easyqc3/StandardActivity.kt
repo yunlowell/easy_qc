@@ -91,9 +91,10 @@ class StandardActivity : AppCompatActivity() {
         db.collection("users")
             .document(email)
             .collection("measurements")
-            .add(data)
+            .document("currentSettings")
+            .set(data)
             .addOnSuccessListener { documentReference ->
-                Log.d("StandardActivity", "데이터 저장 성공! ID: ${documentReference.id}")
+                Log.d("StandardActivity", "데이터 저장 성공!")
             }
             .addOnFailureListener { e ->
                 Log.e("StandardActivity", "데이터 저장 실패: $e")

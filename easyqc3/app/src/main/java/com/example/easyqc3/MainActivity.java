@@ -35,6 +35,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+// DB관련
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.ktx.Firebase;
+
 
 import static java.lang.Math.abs;
 import static java.lang.Math.hypot;
@@ -579,7 +584,30 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
         }
     }
 
+    /*
+    data 가져오는 함수
+     */
 
+    private void getSettingsFromFirestore(String email) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        db.collection("users")
+                .document(email)
+                .collection("measurements")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                        Double referenceLength = document.getDouble("referenceLength");
+                        Double tolerance = document.getDouble("tolerance");
+                        String unit = document.getString("unit");
+
+                        Log.d("Firestore", "측정값: " + referenceLength + " " + unit + ", 허용 오차: " + tolerance);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Firestore", "데이터 가져오기 실패: ", e);
+                });
+    }
 
 
 }
