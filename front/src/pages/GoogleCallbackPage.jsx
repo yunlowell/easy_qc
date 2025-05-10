@@ -5,15 +5,20 @@ function GoogleCallbackPage() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const tokenFromQuery = new URLSearchParams(window.location.search).get('firebase_token');
+        const hash = window.location.hash;
+        const tokenMatch = hash.match(/firebase_token=([^&]+)/);
+        const tokenFromQuery = tokenMatch ? tokenMatch[1] : null;
+
+        console.log("✅ parsed token:", tokenFromQuery);
 
         if (tokenFromQuery) {
-            localStorage.setItem('token', tokenFromQuery);
+            if (!localStorage.getItem('token')) {
+                localStorage.setItem('token', tokenFromQuery);
+            }
             navigate('/home');
-        } else {
-            alert('토큰이 전달되지 않았습니다.');
         }
     }, [navigate]);
+
 
     return (
         <div style={{ textAlign: 'center', marginTop: '100px' }}>

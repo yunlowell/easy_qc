@@ -2,6 +2,7 @@ import os
 import firebase_admin
 from fastapi import FastAPI, HTTPException, Request, Body, Depends
 from fastapi.responses import RedirectResponse
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, EmailStr
 from predict import router as predict_router
 from typing import Dict
@@ -11,6 +12,7 @@ from jose import jwt
 from email.mime.text import MIMEText
 from itsdangerous import URLSafeTimedSerializer
 from firebase_admin import credentials, auth, firestore
+from urllib.parse import urlparse, urlunparse, parse_qs, urlencode
 import time
 import smtplib
 import httpx
@@ -18,6 +20,15 @@ import httpx
 load_dotenv()
 
 app = FastAPI()
+
+# CORS 설정
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"], 
+    allow_credentials=True,
+    allow_methods=["*"],  
+    allow_headers=["*"],
+)
 
 app.include_router(predict_router)
 
@@ -49,7 +60,8 @@ email_serializer = URLSafeTimedSerializer(SECRET_KEY)
 
 # Google OAuth2.0 인증 URL
 @app.get("/auth/google/login")
-def google_login():
+def google_login(request: Request):
+    frontend_redirect = request.query_params.get("redirect")
     google_auth_url = (
         "https://accounts.google.com/o/oauth2/v2/auth"
         "?response_type=code"
@@ -58,6 +70,7 @@ def google_login():
         "&scope=openid%20email%20profile"
         "&access_type=offline"
         "&prompt=consent"
+        f"&state={frontend_redirect}"
     )
     return RedirectResponse(google_auth_url)
 
@@ -65,6 +78,7 @@ def google_login():
 @app.get("/auth/google/callback")
 async def google_callback(request: Request):
     code = request.query_params.get("code")
+    redirect_frontend_url = request.query_params.get("state") or "http://localhost:3000/#/auth/google/callback"
     if not code:
         return {"error": "No code provided"}
 
@@ -80,7 +94,6 @@ async def google_callback(request: Request):
     async with httpx.AsyncClient() as client:
         token_res = await client.post(token_url, data=token_data)
         token_json = token_res.json()
-
         access_token = token_json.get("access_token")
 
         # access_token으로 사용자 정보 가져오기
@@ -115,15 +128,10 @@ async def google_callback(request: Request):
         "lastLoginAt": firestore.SERVER_TIMESTAMP
     }, merge=True)
 
-    return {
-        "firebase_token": custom_token.decode("utf-8"),
-        "user": {
-            "uid": firebase_user.uid,
-            "email": firebase_user.email,
-            "display_name": firebase_user.display_name,
-            "photo_url": firebase_user.photo_url,
-        }
-    }
+    redirect_url = f"{redirect_frontend_url}?firebase_token={custom_token.decode('utf-8')}"
+    print("[DEBUG] Redirecting to:", redirect_url)
+    return RedirectResponse(url=redirect_url)
+
 
 
 # 일반 로그인 모델
@@ -261,23 +269,34 @@ def resend_verification(email: EmailStr = Body(..., embed=True)):
 
     return {"message": "이메일 인증 링크를 다시 보냈습니다. 메일함을 확인하세요!"}
 
-# 로그인 API
+# 일반 로그인 API
 @app.post("/login")
 def login(user: UserLogin):
     user_data = get_user_from_firestore(user.email)
 
+    # 존재 여부 체크
     if not user_data:
         raise HTTPException(status_code=400, detail="존재하지 않는 이메일입니다.")
 
+    # 이메일 인증 여부 체크
     if not user_data.get("verified", False):
         raise HTTPException(status_code=403, detail="이메일 인증이 완료되지 않았습니다.")
 
+    # 로그인 타입 체크
+    if user_data.get("loginType") == "google" or "hashed_password" not in user_data:
+        raise HTTPException(
+            status_code=400,
+            detail="이 계정은 구글 로그인 전용입니다. 구글 로그인 버튼을 이용하세요."
+        )
+    
+    # 비밀번호 체크
     if not verify_password(user.password, user_data["hashed_password"]):
         raise HTTPException(status_code=400, detail="비밀번호가 틀렸습니다.")
 
+    # Token 생성
     access_token = create_access_token(data={"sub": user.email})
-
-    return {"access_token": access_token, "token_type": "bearer"}
+    user_id = user_data.get("uid")
+    return {"access_token": access_token, "token_type": "bearer", "email": user.email}
 
 @app.get("/")
 def root():
