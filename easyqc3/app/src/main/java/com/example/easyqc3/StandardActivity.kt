@@ -89,9 +89,8 @@ class StandardActivity : AppCompatActivity() {
 
         db.collection("users")
             .document(email)
-            .collection("measurements")
-            .document("currentSettings")
-            .set(data)
+            .collection("currentSettings")
+            .add(data)
             .addOnSuccessListener { documentReference ->
                 Log.d("StandardActivity", "데이터 저장 성공!")
             }
