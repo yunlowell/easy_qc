@@ -1,7 +1,6 @@
 package com.example.easyqc3
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.ArrayAdapter
@@ -69,8 +68,9 @@ class StandardActivity : AppCompatActivity() {
 
                 saveDataToFirestore(email, setting)
 
-                val intent = Intent(this, HomeActivity::class.java)
-                startActivity(intent)
+                //val intent = Intent(this, HomeActivity::class.java)   //이렇게 하면 back 버튼 눌렀을때 돌아오는 문제 발생.
+                //startActivity(intent)
+                finish() // 현재 액티비티 종료
 
             }
         } else {

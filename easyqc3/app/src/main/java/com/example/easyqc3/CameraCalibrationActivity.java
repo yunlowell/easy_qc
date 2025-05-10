@@ -23,6 +23,7 @@ import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Mat;
 
 import android.app.ProgressDialog;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -91,7 +92,7 @@ public class CameraCalibrationActivity extends CameraActivity implements CvCamer
                 // Save the calibration result
                 final Resources res = getResources();
                 if (mCalibrator.getCornersBufferSize() < 2) {
-                    Toast.makeText(CameraCalibrationActivity.this, res.getString(R.string.more_samples), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CameraCalibrationActivity.this, "샘플 수집이 부족 합니다.", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -121,13 +122,19 @@ public class CameraCalibrationActivity extends CameraActivity implements CvCamer
                         mCalibrator.clearCorners();
                         mOnCameraFrameRender = new OnCameraFrameRender(new CalibrationFrameRender(mCalibrator));
                         String resultMessage = (mCalibrator.isCalibrated()) ?
-                                res.getString(R.string.calibration_successful)  + " " + mCalibrator.getAvgReprojectionError() :
+                                res.getString(R.string.calibration_successful) :
                                 res.getString(R.string.calibration_unsuccessful);
                         (Toast.makeText(CameraCalibrationActivity.this, resultMessage, Toast.LENGTH_SHORT)).show();
 
                         if (mCalibrator.isCalibrated()) {
                             CalibrationResult.save(CameraCalibrationActivity.this,
                                     mCalibrator.getCameraMatrix(), mCalibrator.getDistortionCoefficients());
+
+                            //calibration button disable
+                            SharedPreferences prefs = getSharedPreferences("prefs", MODE_PRIVATE);
+                            prefs.edit().putBoolean("calibration_button_enabled", false).apply();
+
+                            finish();
                         }
                     }
                 }.execute();
