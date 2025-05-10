@@ -84,8 +84,8 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
     private static final double TRACK_DIST_THRESH = 80.0;       // 추적 허용 거리
     private static final double TRACK_SIZE_RATIO = 0.3;         // 추적 허용 크기비율
 
-    private double mScaleH_pixelPerMM = 0.0; // 세로 스케일 (px/mm)
-    private double mScaleW_pixelPerMM = 0.0; // 가로 스케일 (px/mm)
+    private double[] mScaleH_pixelPerMM = new double[]{0.0, 0.0};   // 세로 스케일 (px/mm)
+    private double[] mScaleW_pixelPerMM = new double[]{0.0, 0.0};   // 가로 스케일 (px/mm)
 
     // 사용자가 터치한 커스텀 중심 좌표
     private Point customCenter = null;
@@ -230,8 +230,7 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
                 Imgproc.Canny(inputFrame.gray(), mIntermediateMat, 80.0, 100.0);
                 Imgproc.cvtColor(mIntermediateMat, mRgba, Imgproc.COLOR_GRAY2RGBA, 4);
                 if (mDetectAble) {
-                    double pixelPerMM = 4.2; // mm당 픽셀 수 (기준값)
-                    detectAndTrackRectangle2(mIntermediateMat, mRgba, pixelPerMM);
+                    detectAndTrackRectangle2(mIntermediateMat, mRgba);
 
                     if(mDrawTouchCircle) drawTouchFeedback(mRgba); // 사용자 터치 피드백 그리기
                 }
@@ -302,7 +301,7 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
     /**
      * 가장 중심에 가까운 사각형을 선택하여 추적 및 치수 측정
      */
-    private void detectAndTrackRectangle2(Mat edgeMat, Mat outputRgbaMat, double pixelPerMM) {
+    private void detectAndTrackRectangle2(Mat edgeMat, Mat outputRgbaMat) {
         List<MatOfPoint> contours = new ArrayList<>();
         Imgproc.findContours(edgeMat.clone(), contours, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
@@ -328,8 +327,8 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
         RotatedRect bestTracked = trackRectangle2(candidates);
 
         if (bestTracked != null) {
-            double widthMM = bestTracked.size.width / mScaleW_pixelPerMM;   //pixelPerMM;
-            double heightMM = bestTracked.size.height / mScaleH_pixelPerMM; //pixelPerMM;
+            //double widthMM = bestTracked.size.width / mScaleW_pixelPerMM;   //pixelPerMM;
+            //double heightMM = bestTracked.size.height / mScaleH_pixelPerMM; //pixelPerMM;
 
             // 사각형을 선으로 표시
             Point[] points = new Point[4];
@@ -338,12 +337,35 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
                 Imgproc.line(outputRgbaMat, points[i], points[(i + 1) % 4], new Scalar(0, 255, 0), 2);
             }
 
+            // 변 길이 계산 (반시계 방향으로 p0→p1, p1→p2 ...)
+            double len0 = Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y); // 변 1
+            double len1 = Math.hypot(points[1].x - points[2].x, points[1].y - points[2].y); // 변 2
+            double len2 = Math.hypot(points[2].x - points[3].x, points[2].y - points[3].y); // 변 3
+            double len3 = Math.hypot(points[3].x - points[0].x, points[3].y - points[0].y); // 변 4
+
+            // 평균 가로/세로 추정 (변 0,2 = 가로 / 변 1,3 = 세로)
+            double widthPx  = (len0 + len2) / 2.0;
+            double heightPx = (len1 + len3) / 2.0;
+
+            // mm 변환
+            double widthMM  = widthPx  / (mScaleW_pixelPerMM[0] + mScaleW_pixelPerMM[1]);
+            double heightMM = heightPx / (mScaleH_pixelPerMM[0] + mScaleH_pixelPerMM[1]);
+
+            if (mScaleH_pixelPerMM[1] > 0.0 && mScaleW_pixelPerMM[1] > 0.0) {
+                widthMM  *= 2.0;
+                heightMM *= 2.0;
+            }
+
+            Point ptDraw = new Point(
+                bestTracked.center.x - widthPx/2, bestTracked.center.y + heightPx/2 + 20
+            );
+
             // 텍스트로 mm 단위 치수 출력
             Imgproc.putText(
                     outputRgbaMat,
                     String.format("%.1fmm x %.1fmm", widthMM, heightMM),
-                    bestTracked.center,
-                    Imgproc.FONT_HERSHEY_SIMPLEX, 0.8,
+                    ptDraw,  //bestTracked.center,
+                    Imgproc.FONT_HERSHEY_SIMPLEX, 0.6,
                     new Scalar(255, 0, 0), 2
             );
         }
@@ -551,7 +573,11 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
     private void detectArucoAndEstimateScale(Mat inputMat, List<Mat> corners, Mat ids) {
 
         if (ids.total() > 0 && corners.size() > 0) {
-            for (int i = 0; i < ids.rows(); i++) {
+
+            mScaleW_pixelPerMM[0] = mScaleW_pixelPerMM[1] = 0.0;
+            mScaleH_pixelPerMM[0] = mScaleH_pixelPerMM[1] = 0.0;
+
+            for (int i = 0; i < ids.rows() && i<2 ; i++) {
                 Mat corner = corners.get(i);
                 if (corner.cols() < 4) continue;
 
@@ -568,12 +594,12 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
                 double avgWidth = (width1 + width2) / 2.0;
                 double avgHeight = (height1 + height2) / 2.0;
 
-                mScaleW_pixelPerMM = avgWidth / arucoMarkerLengthMM;
-                mScaleH_pixelPerMM = avgHeight / arucoMarkerLengthMM;
+                mScaleW_pixelPerMM[i] = avgWidth / arucoMarkerLengthMM;
+                mScaleH_pixelPerMM[i] = avgHeight / arucoMarkerLengthMM;
 
-                Imgproc.putText(inputMat, String.format("ScaleW: %.2f px/mm", mScaleW_pixelPerMM),
+                Imgproc.putText(inputMat, String.format("Marker%d ScaleW: %.2f px/mm", i+1, mScaleW_pixelPerMM[i]),
                         new Point(30, 90 + i * 40), Imgproc.FONT_HERSHEY_SIMPLEX, 0.6, new Scalar(0, 255, 0), 2);
-                Imgproc.putText(inputMat, String.format("ScaleH: %.2f px/mm", mScaleH_pixelPerMM),
+                Imgproc.putText(inputMat, String.format("Marker%d ScaleH: %.2f px/mm", i+1, mScaleH_pixelPerMM[i]),
                         new Point(30, 110 + i * 40), Imgproc.FONT_HERSHEY_SIMPLEX, 0.6, new Scalar(0, 255, 0), 2);
             }
         }
