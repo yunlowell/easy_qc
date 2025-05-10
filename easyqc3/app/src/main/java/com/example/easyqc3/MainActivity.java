@@ -1,6 +1,8 @@
 package com.example.easyqc3;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -129,7 +131,16 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
 
         // 버튼 이벤트 설정
         btnGRAY = findViewById(R.id.btn2);
-        btnGRAY.setOnClickListener(v -> mDetectAble = false);
+        btnGRAY.setOnClickListener(v -> {
+            mDetectAble = false;
+
+            SharedPreferences sharedPrefs = getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
+            String email = sharedPrefs.getString("email", null);
+            Log.d("StandardActivity", "onCreate에서 불러온 user_email: " + email);
+
+            getSettingsFromFirestore(email);
+
+        });
 
         btnCANNY = findViewById(R.id.btn3);
         btnCANNY.setOnClickListener(v -> {

@@ -7,15 +7,13 @@ import android.util.Log
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
-import android.widget.ImageView
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import com.example.easyqc3.databinding.ActivityStandardBinding
 import com.example.easyqc3.model.MeasurementSetting
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
@@ -50,6 +48,7 @@ class StandardActivity : AppCompatActivity() {
         )
 
         if (email != null) {
+            initSettingsFromFirestore(email)            // Firestore에서 데이터 가져오기
             setSendButton.setOnClickListener {
                 val referenceLength = setReferenceLength.text.toString().toDoubleOrNull()
                 val tolerance = setTolerance.text.toString().toDoubleOrNull()
@@ -100,6 +99,36 @@ class StandardActivity : AppCompatActivity() {
                 Log.e("StandardActivity", "데이터 저장 실패: $e")
             }
     }
+
+    /*
+    data 가져와서 초기화 해주는 함수
+     */
+    private fun initSettingsFromFirestore(email: String) {
+        val db = FirebaseFirestore.getInstance()
+
+        db.collection("users")
+            .document(email)
+            .collection("measurements")
+            .get()
+            .addOnSuccessListener { queryDocumentSnapshots: QuerySnapshot ->
+                for (document in queryDocumentSnapshots) {
+                    val referenceLength = document.getDouble("referenceLength")
+                    val tolerance = document.getDouble("tolerance")
+                    val unit = document.getString("unit")
+
+                    setReferenceLength.setText(referenceLength.toString())
+                    setTolerance.setText(tolerance.toString())
+                    val unitPosition = resources.getStringArray(R.array.units).indexOf(unit)
+                    setUnit.setSelection(unitPosition)
+
+                    Log.d("Firestore", "측정값: $referenceLength $unit, 허용 오차: $tolerance")
+                }
+            }
+            .addOnFailureListener { e: Exception? ->
+                Log.e("Firestore", "데이터 가져오기 실패: ", e)
+            }
+    }
+
 }
 
 

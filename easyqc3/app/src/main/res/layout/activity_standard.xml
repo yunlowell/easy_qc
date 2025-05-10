@@ -128,7 +128,7 @@
             android:gravity="center"
             android:background="@drawable/select_box"
             android:hint="값 입력" />
-
+<!--
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -151,6 +151,7 @@
             android:gravity="center"
             android:background="@drawable/select_box"
             android:hint="값 입력" />
+-->
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/setSendButton"
