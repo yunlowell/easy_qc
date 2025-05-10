@@ -111,6 +111,10 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
         super.onCreate(savedInstanceState);
         Log.i(TAG, "called onCreate");
 
+        //calibration 버튼 활성화
+        SharedPreferences prefs = getSharedPreferences("prefs", MODE_PRIVATE);
+        prefs.edit().putBoolean("calibration_button_enabled", true).apply();
+
         // OpenCV 초기화 실패 시 앱 종료
         if (!OpenCVLoader.initLocal()) {
             Toast.makeText(this, "OpenCV initialization failed!", Toast.LENGTH_LONG).show();
@@ -134,11 +138,13 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
         btnGRAY.setOnClickListener(v -> {
             mDetectAble = false;
 
+            //테스트 코드 email기반으로 Firestore에서 설정값을 불러오기 /////////////
             SharedPreferences sharedPrefs = getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
             String email = sharedPrefs.getString("email", null);
             Log.d("StandardActivity", "onCreate에서 불러온 user_email: " + email);
 
             getSettingsFromFirestore(email);
+            /// //////////////////////////////////////////////////////////////
 
         });
 
@@ -151,6 +157,7 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
         btnCameraCalibration = findViewById(R.id.btn4);
         btnCameraCalibration.setOnClickListener(v -> {
             startActivity(new Intent(this, CameraCalibrationActivity.class));
+            //btnCameraCalibration.setEnabled(false);     //한번 동작하면 비활성화 하도록 수정.
         });
     }
 
@@ -187,6 +194,12 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
         super.onResume();
         if (mOpenCvCameraView != null) mOpenCvCameraView.enableView();
         invalidateOptionsMenu();
+
+        SharedPreferences prefs = getSharedPreferences("prefs", MODE_PRIVATE);
+        boolean enabled = prefs.getBoolean("calibration_button_enabled", true);
+
+        btnCameraCalibration.setEnabled(enabled);
+
     }
 
     /** 앱 종료 시 처리 */
@@ -319,19 +332,40 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
      */
     private void detectAndTrackRectangle2(Mat edgeMat, Mat outputRgbaMat) {
         List<MatOfPoint> contours = new ArrayList<>();
-        Imgproc.findContours(edgeMat.clone(), contours, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+        Mat hierarchy = new Mat();
 
-        if (contours.isEmpty()) return;
+        // 외부 + 내부 윤곽선 모두 감지
+        Imgproc.findContours(edgeMat.clone(), contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
+        if (contours.isEmpty() || hierarchy.empty()) return;
+
 
         // 중심 기준점 설정 (사용자 지정 중심이 없을 경우 화면 중앙)
         Point centerRef = (customCenter != null) ? customCenter : new Point(outputRgbaMat.width() / 2.0, outputRgbaMat.height() / 2.0);
 
         // 윤곽선으로부터 외접 사각형 추출
         List<RotatedRect> candidates = new ArrayList<>();
-        for (MatOfPoint contour : contours) {
-            if (Imgproc.contourArea(contour) < 100) continue;  // 너무 작은 객체는 무시
-            RotatedRect rect = Imgproc.minAreaRect(new MatOfPoint2f(contour.toArray()));
-            candidates.add(rect);
+
+        // 윤곽선으로부터 후보 사각형 추출
+        for (int i = 0; i < contours.size(); i++) {
+            //double[] h = hierarchy.get(0, i);
+            //int parentIdx = (int) h[3];
+            if (Imgproc.contourArea(contours.get(i)) < 400) continue;  // 작은 윤곽선은 제외
+
+            // 1. contour를 2f 타입으로 변환
+            MatOfPoint2f contour2f = new MatOfPoint2f(contours.get(i).toArray());
+
+            // 2. 근사 다각형 계산 (0.02는 정밀도 - 필요 시 조절) - 돌기 부분 제거하기
+            MatOfPoint2f approxCurve = new MatOfPoint2f();
+            Imgproc.approxPolyDP(contour2f, approxCurve, 0.02 * Imgproc.arcLength(contour2f, true), true);
+
+            // 3. 꼭짓점이 4개일 때만 사각형으로 간주
+            if (approxCurve.total() == 4) {
+                //RotatedRect rect = Imgproc.minAreaRect(new MatOfPoint2f(contours.get(i).toArray()));
+
+                RotatedRect rect = Imgproc.minAreaRect(approxCurve);
+                candidates.add(rect);   // 모든 윤곽선에 대해 사각형 추출
+            }
+
         }
 
         // 중심에서 가까운 순으로 정렬
@@ -360,12 +394,16 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
             double len3 = Math.hypot(points[3].x - points[0].x, points[3].y - points[0].y); // 변 4
 
             // 평균 가로/세로 추정 (변 0,2 = 가로 / 변 1,3 = 세로)
-            double widthPx  = (len0 + len2) / 2.0;
-            double heightPx = (len1 + len3) / 2.0;
+            double width  = (len0 + len2) / 2.0;
+            double height = (len1 + len3) / 2.0;
+
+            // 가로세로 바뀜 방지: 길이가 더 긴 쪽을 가로로 간주
+            double avgWidth = Math.max(width, height);
+            double avgHeight = Math.min(width, height);
 
             // mm 변환
-            double widthMM  = widthPx  / (mScaleW_pixelPerMM[0] + mScaleW_pixelPerMM[1]);
-            double heightMM = heightPx / (mScaleH_pixelPerMM[0] + mScaleH_pixelPerMM[1]);
+            double widthMM  = avgWidth  / (mScaleW_pixelPerMM[0] + mScaleW_pixelPerMM[1]);
+            double heightMM = avgHeight / (mScaleH_pixelPerMM[0] + mScaleH_pixelPerMM[1]);
 
             if (mScaleH_pixelPerMM[1] > 0.0 && mScaleW_pixelPerMM[1] > 0.0) {
                 widthMM  *= 2.0;
@@ -373,7 +411,7 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
             }
 
             Point ptDraw = new Point(
-                bestTracked.center.x - widthPx/2, bestTracked.center.y + heightPx/2 + 20
+                bestTracked.center.x - avgWidth/2, bestTracked.center.y + avgHeight/2 + 20
             );
 
             // 텍스트로 mm 단위 치수 출력
@@ -382,7 +420,7 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
                     String.format("%.1fmm x %.1fmm", widthMM, heightMM),
                     ptDraw,  //bestTracked.center,
                     Imgproc.FONT_HERSHEY_SIMPLEX, 0.6,
-                    new Scalar(255, 0, 0), 2
+                    new Scalar(0, 255, 0), 2
             );
         }
     }
@@ -395,6 +433,7 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
 
         if (trackedRect == null) {
             trackedRect = candidates.get(0);
+
             return trackedRect;
         }
 
@@ -474,7 +513,7 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
                     String.format("%.1fmm x %.1fmm", widthMM, heightMM),
                     box.center,
                     Imgproc.FONT_HERSHEY_SIMPLEX, 0.8,
-                    new Scalar(0, 0, 255), 2
+                    new Scalar(0, 255, 0), 2
             );
         }
     }
@@ -519,7 +558,7 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
                     String.format("%.1fmm x %.1fmm", widthMM, heightMM),
                     box.center,
                     Imgproc.FONT_HERSHEY_SIMPLEX, 0.8,
-                    new Scalar(255, 0, 0), 2
+                    new Scalar(0, 255, 0), 2
             );
         }
     }
@@ -597,6 +636,8 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
                 Mat corner = corners.get(i);
                 if (corner.cols() < 4) continue;
 
+
+                //p0 -> lefttop 으로 고정되지 않아서 가로세로가 바뀌는 문제 발생함.
                 Point p0 = new Point(corner.get(0, 0));
                 Point p1 = new Point(corner.get(0, 1));
                 Point p2 = new Point(corner.get(0, 2));
@@ -607,16 +648,30 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
                 double height1 = Math.hypot(p1.x - p2.x, p1.y - p2.y);
                 double height2 = Math.hypot(p3.x - p0.x, p3.y - p0.y);
 
-                double avgWidth = (width1 + width2) / 2.0;
-                double avgHeight = (height1 + height2) / 2.0;
+                //double avgWidth = (width1 + width2) / 2.0;
+                //double avgHeight = (height1 + height2) / 2.0;
+
+                // 대략 수평인 변 두 개와 수직인 변 두 개로 판단
+                double width = (width1 + width2) / 2.0;
+                double height = (height1 + height2) / 2.0;
+
+                // 가로세로 바뀜 방지: 길이가 더 긴 쪽을 가로로 간주
+                double avgWidth = Math.max(width, height);
+                double avgHeight = Math.min(width, height);
 
                 mScaleW_pixelPerMM[i] = avgWidth / arucoMarkerLengthMM;
                 mScaleH_pixelPerMM[i] = avgHeight / arucoMarkerLengthMM;
 
-                Imgproc.putText(inputMat, String.format("Marker%d ScaleW: %.2f px/mm", i+1, mScaleW_pixelPerMM[i]),
-                        new Point(30, 90 + i * 40), Imgproc.FONT_HERSHEY_SIMPLEX, 0.6, new Scalar(0, 255, 0), 2);
-                Imgproc.putText(inputMat, String.format("Marker%d ScaleH: %.2f px/mm", i+1, mScaleH_pixelPerMM[i]),
-                        new Point(30, 110 + i * 40), Imgproc.FONT_HERSHEY_SIMPLEX, 0.6, new Scalar(0, 255, 0), 2);
+                Scalar fontColor = null;
+                if (mScaleW_pixelPerMM[i] -mScaleH_pixelPerMM[i] <= 0.01 && mScaleW_pixelPerMM[i] -mScaleH_pixelPerMM[i] >= -0.01) {
+                    fontColor = new Scalar(0, 255, 0);
+                } else {
+                    fontColor = new Scalar(255, 0, 0);
+                }
+
+                Imgproc.putText(inputMat, String.format("No.%d scale(px/mm) W:%.2f , H:%.2f ", i+1, mScaleW_pixelPerMM[i], mScaleH_pixelPerMM[i]),
+                        new Point(30, 90 + i * 25), Imgproc.FONT_HERSHEY_SIMPLEX, 0.6, fontColor, 2);
+
             }
         }
     }
