@@ -46,8 +46,8 @@ class LoginActivity : AppCompatActivity() {
 
             if (email.isNotEmpty() && password.isNotEmpty()) {
                 // demoLogin 쓸 때 아래 함수 주석, 서버 로그인 쓸 때, demoLogin 함수 주석
-                loginApiUser(email, password)
-                // demoLogin(email, password)
+                // loginApiUser(email, password)
+                demoLogin(email, password)
 
                 // 구글 로그인 연동 코드는 나중에.....
 

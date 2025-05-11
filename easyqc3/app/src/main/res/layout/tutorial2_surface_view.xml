@@ -27,14 +27,14 @@
                 android:id="@+id/btn1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="RGB" />
+                android:text="RGB" /> -->
 
             <Button
                 android:id="@+id/btn2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="검증 중지" />
-    -->
+
             <Button
                 android:id="@+id/btn3"
                 android:layout_width="wrap_content"
