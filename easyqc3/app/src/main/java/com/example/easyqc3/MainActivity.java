@@ -1,5 +1,6 @@
 package com.example.easyqc3;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -30,7 +31,6 @@ import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
 import org.opencv.objdetect.ArucoDetector;
-import org.opencv.objdetect.Dictionary;
 
 
 import java.util.ArrayList;
@@ -41,11 +41,12 @@ import java.util.List;
 // DB관련
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.ktx.Firebase;
 
 
 import static java.lang.Math.abs;
 import static java.lang.Math.hypot;
+
+import androidx.annotation.NonNull;
 
 /**
  * MainActivity: OpenCV 카메라 화면에서 윤곽선 기반 사각형을 추적하고 실시간 치수(mm)를 측정하는 활동 클래스
@@ -83,7 +84,7 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
     private boolean mDrawTouchCircle = false;
 
     // UI 버튼들
-    private Button btnGRAY;
+    //private Button btnGRAY;
     private Button btnCANNY;
     private Button btnCameraCalibration;
 
@@ -96,10 +97,11 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
     private static final double TRACK_DIST_THRESH = 80.0;       // 추적 허용 센터거리 pixel
     private static final double TRACK_SIZE_RATIO = 0.1;         // 추적 허용 크기비율
 
-    private double[] mScaleH_pixelPerMM = new double[]{0.0, 0.0};   // 세로 스케일 (px/mm)
-    private double[] mScaleW_pixelPerMM = new double[]{0.0, 0.0};   // 가로 스케일 (px/mm)
+    private final double[] mScaleH_pixelPerMM = new double[]{0.0, 0.0};   // 세로 스케일 (px/mm)
+    private final double[] mScaleW_pixelPerMM = new double[]{0.0, 0.0};   // 가로 스케일 (px/mm)
 
-    private int[] mScaleInCount = new int[]{0, 0};   // 가로 세로 스케일 적합 횟수 (px/mm)
+    private final int[] mScaleInCount = new int[]{0, 0};   // 가로 세로 스케일 적합 횟수 (px/mm)
+    private int mTrackingSuccessCount = 0;   // 추적 성공 횟수
 
 
     // 사용자가 터치한 커스텀 중심 좌표
@@ -161,6 +163,8 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
             else {
                 btnCANNY.setText("검증 중지");
                 mDetectAble = true;
+                findViewById(R.id.result_all_Layout).setVisibility(View.VISIBLE);
+                resetResult();
             }
             trackedRect = null;
         });
@@ -176,6 +180,9 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
         tvRealLengthValue = findViewById(R.id.real_length_value);
         tvJudgement_value = findViewById(R.id.judgement_value);
 
+        findViewById(R.id.result_all_Layout).setVisibility(View.INVISIBLE);
+
+
     }
 
     /** 메뉴 생성 */
@@ -190,7 +197,7 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
 
     /** 메뉴 선택 처리 */
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item == mItemPreviewRGBA) mViewMode = VIEW_MODE_RGBA;
         else if (item == mItemPreviewGray) mViewMode = VIEW_MODE_GRAY;
         else if (item == mItemPreviewCanny) mViewMode = VIEW_MODE_CANNY;
@@ -284,9 +291,11 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
                 if (mDetectAble) {
                     detectAndTrackRectangle2(mIntermediateMat, mRgba);
 
-                    if(mDrawTouchCircle) drawTouchFeedback(mRgba); // 사용자 터치 피드백 그리기
+                    if(mDrawTouchCircle) drawTouchFeedback(mRgba);  // 사용자 터치 피드백 그리기
+
+                    detectArucoAndEstimateScale(mRgba, corners, ids);   // 아루코 마커 검출 및 스케일 추정
                 }
-                detectArucoAndEstimateScale(mRgba, corners, ids);
+
                 return mRgba;
             case VIEW_MODE_FEATURES:
                 mRgba = inputFrame.rgba();
@@ -299,6 +308,7 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
     }
 
     /** 사용자 터치 이벤트 처리 */
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         //if (event.getAction() == MotionEvent.ACTION_DOWN || event.getAction() == MotionEvent.ACTION_MOVE) {
@@ -357,10 +367,13 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
         List<MatOfPoint> contours = new ArrayList<>();
         Mat hierarchy = new Mat();
 
-        // 외부 + 내부 윤곽선 모두 감지
-        Imgproc.findContours(edgeMat.clone(), contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
-        if (contours.isEmpty() || hierarchy.empty()) return;
+        // 외부 윤곽선만 감지
+        Imgproc.findContours(edgeMat.clone(), contours, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+        if (contours.isEmpty()) return;
 
+        // 외부 + 내부 윤곽선 모두 감지
+        //Imgproc.findContours(edgeMat.clone(), contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
+        //if (contours.isEmpty() || hierarchy.empty()) return;
 
         // 중심 기준점 설정 (사용자 지정 중심이 없을 경우 화면 중앙)
         Point centerRef = (customCenter != null) ? customCenter : new Point(outputRgbaMat.width() / 2.0, outputRgbaMat.height() / 2.0);
@@ -372,8 +385,15 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
         for (int i = 0; i < contours.size(); i++) {
             //double[] h = hierarchy.get(0, i);
             //int parentIdx = (int) h[3];
-            if (Imgproc.contourArea(contours.get(i)) < 400) continue;  // 작은 윤곽선은 제외
 
+            double  contourArea = Imgproc.contourArea(contours.get(i));
+            if (contourArea < 400 || contourArea > 90000) continue;  // 작은(20x20) 큰(300x300) 윤곽선은 제외
+
+            //돌기 제거 없이 있는 그대로 모든 윤곽선에 대해 사각형 추출
+            RotatedRect rect = Imgproc.minAreaRect(new MatOfPoint2f(contours.get(i).toArray()));
+            candidates.add(rect);   // 모든 윤곽선에 대해 사각형 추출
+
+            /* 돌기 제거하는 코드 넣으면 제품 추출이 잘 안됨.
             // 1. contour를 2f 타입으로 변환
             MatOfPoint2f contour2f = new MatOfPoint2f(contours.get(i).toArray());
 
@@ -381,13 +401,12 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
             MatOfPoint2f approxCurve = new MatOfPoint2f();
             Imgproc.approxPolyDP(contour2f, approxCurve, 0.02 * Imgproc.arcLength(contour2f, true), true);
 
-            // 3. 꼭짓점이 4개일 때만 사각형으로 간주
-            if (approxCurve.total() == 4) {
-                //RotatedRect rect = Imgproc.minAreaRect(new MatOfPoint2f(contours.get(i).toArray()));
-
+            // 3. 꼭짓점이 4개일 때만 사각형으로 간주  모든 contour에 대해 사각형 추출 하도록 수정.
+            //if (approxCurve.total() == 4) {
                 RotatedRect rect = Imgproc.minAreaRect(approxCurve);
                 candidates.add(rect);   // 모든 윤곽선에 대해 사각형 추출
-            }
+            //}
+            */
 
         }
 
@@ -445,6 +464,10 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
                     Imgproc.FONT_HERSHEY_SIMPLEX, 0.7,
                     new Scalar(0, 255, 0), 2
             );
+
+            // 가로 측정치를 UI에 표시하고, 판정기준에 부함할때 판정치를 UI에 표시
+            if (mDetectAble)
+                showConfirmedResult( widthMM );         //이것 때문에 자주 죽네... 방법 검토 필요함.
         }
     }
 
@@ -479,6 +502,10 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
 
         if (best != null) {
             trackedRect = best;
+            mTrackingSuccessCount++;        // 추적 성공 횟수 증가
+        }
+        else {
+            mTrackingSuccessCount = 0;      // 추적 실폐하면 0으로 초기화
         }
 
         return trackedRect;
@@ -639,7 +666,7 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
                 mScaleH_pixelPerMM[i] = avgHeight / arucoMarkerLengthMM;
 
                 Scalar fontColor = null;
-                if (mScaleW_pixelPerMM[i] -mScaleH_pixelPerMM[i] <= 0.02 && mScaleW_pixelPerMM[i] -mScaleH_pixelPerMM[i] >= -0.02) {
+                if (mScaleW_pixelPerMM[i] -mScaleH_pixelPerMM[i] <= 0.05 && mScaleW_pixelPerMM[i] -mScaleH_pixelPerMM[i] >= -0.05) {
                     fontColor = new Scalar(0, 255, 0);
                     mScaleInCount[i] += 1;
                 } else {
@@ -647,7 +674,7 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
                     mScaleInCount[i] = 0;
                 }
 
-                Imgproc.putText(inputMat, String.format("No.%d scale(px/mm) W:%.2f , H:%.2f ", i+1, mScaleW_pixelPerMM[i], mScaleH_pixelPerMM[i]),
+                Imgproc.putText(inputMat, String.format("No.%d scale(px/mm) W:%.2f , H:%.2f count(%d)", i+1, mScaleW_pixelPerMM[i], mScaleH_pixelPerMM[i], mScaleInCount[i]),
                         new Point(30, 90 + i * 25), Imgproc.FONT_HERSHEY_SIMPLEX, 0.6, fontColor, 2);
 
             }
@@ -678,5 +705,48 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
                     Log.e("Firestore", "데이터 가져오기 실패: " + e.getMessage(), e);
                 });
     }
+
+    private void resetResult(){
+        // 기준값 update용
+        //tvLengthValue 해당값은 설정 되어 있으므로 reset 하지 않음
+        tvRealLengthValue.setText(String.format(" -- %s", mDBunit));
+        tvJudgement_value.setText(" -- ");
+        tvJudgement_value.setTextColor(getResources().getColor(R.color.green));
+    }
+
+    private void showConfirmedResult(double widthMM) {
+
+        //Aruco마커 2개의 가로세로 스케일이 적합하고, Tracking이 성공한 경우에만 결과를 판단한다.
+        if( mScaleInCount[0]>10 && mScaleInCount[1]>10 && mTrackingSuccessCount>1) {
+
+            //검증 종료를 한다.
+            mDetectAble = false;
+            btnCANNY.setText("검증 시작");
+
+            // 기준값 update용
+            tvRealLengthValue.setText(String.format(" %.2f %s", widthMM, mDBunit));
+
+            // 허용 오차 범위 계산
+            double lowerBound = mDBreferenceLength - mDBtolerance;
+            double upperBound = mDBreferenceLength + mDBtolerance;
+
+            // 결과 판단 및 텍스트 색상 변경
+            if (widthMM >= lowerBound && widthMM <= upperBound) {
+                tvJudgement_value.setText("OK");
+                tvJudgement_value.setTextColor(getResources().getColor(R.color.green));
+
+                //양품으로 history 저장.
+            } else {
+                tvJudgement_value.setText("NG");
+                tvJudgement_value.setTextColor(getResources().getColor(R.color.red));
+
+                //불량으로 history 저장.
+            }
+
+
+
+        }
+    }
+
 
 }

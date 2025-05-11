@@ -5,5 +5,7 @@
     <color name="deepblue">#015a95</color>
     <color name="nomalblue">#0278c2</color>
     <color name="lightblue">#b1d5ec</color>
+    <color name="green">#388E3C</color>
+    <color name='red'>#F44336</color>
 
 </resources>

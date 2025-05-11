@@ -51,6 +51,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/result_all_Layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
