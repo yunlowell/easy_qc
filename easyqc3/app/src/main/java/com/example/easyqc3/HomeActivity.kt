@@ -10,15 +10,23 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import android.util.Log
+import android.widget.TextView
+import org.w3c.dom.Text
 
 class HomeActivity : AppCompatActivity() {
 
     private var db: FirebaseFirestore = FirebaseFirestore.getInstance()
 
+    private lateinit var goodProductcnt: TextView
+    private lateinit var badProductcnt: TextView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_home)
+
+        goodProductcnt = findViewById(R.id.goodProductResult)
+        badProductcnt = findViewById(R.id.badProductResult)
 
         val gotoMeasuringBtn = findViewById<ImageView>(R.id.gotoMeasuringBtn)
         val gotoStandardBtn = findViewById<ImageView>(R.id.gotoStandardBtn)
@@ -42,33 +50,45 @@ class HomeActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        if (email != null) {
-            getSettingsToFirestore(email)
-        }
-
-
-
     }
 
-    private fun getSettingsToFirestore(email: String) {
+    override fun onResume() {
+        super.onResume()
 
-        // firestore의 문서 구조에 순차적으로 접근하는 중. (firestore에서 확인해보시면 이해하기 쉽습니다.)
+        val sharedPrefs = getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+        val email = sharedPrefs.getString("email", null)
+
+        if (email != null) {
+            getResultCountsFromFirestore(email) { okayCount, failCount ->
+                goodProductcnt.text = okayCount.toString()
+                badProductcnt.text = failCount.toString()
+            }
+        }
+    }
+
+    private fun getResultCountsFromFirestore(email: String, callback: (okayCount: Int, failCount: Int) -> Unit) {
         db.collection("users")
             .document(email)
             .collection("measurements")
             .get()
             .addOnSuccessListener { querySnapshot ->
-                for (document in querySnapshot) {
-                    // 각 데이터 가져오기
-                    val referenceLength = document.getDouble("referenceLength")
-                    val tolerance = document.getDouble("tolerance")
-                    val unit = document.getString("unit")
+                var okayCount = 0
+                var failCount = 0
 
-                    Log.d("Firestore", "측정값: $referenceLength $unit, 허용 오차: $tolerance")
+                for (document in querySnapshot) {
+                    val result = document.getString("result")
+                    when (result) {
+                        "okay" -> okayCount++
+                        "fail" -> failCount++
+                    }
                 }
+                // 결과를 콜백으로 반환
+                callback(okayCount, failCount)
             }
             .addOnFailureListener { e ->
                 Log.e("Firestore", "데이터 가져오기 실패: $e")
+                // 실패 시 0으로 콜백
+                callback(0, 0)
             }
     }
 }

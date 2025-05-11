@@ -27,9 +27,6 @@ class HistoryActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_history)
 
-        val sharedPrefs = getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
-        val email = sharedPrefs.getString("email", null)
-
         recyclerView = findViewById(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.setHasFixedSize(true)
@@ -37,6 +34,13 @@ class HistoryActivity : AppCompatActivity() {
         historyList = mutableListOf()
         adapter = HistoryAdapter(historyList)
         recyclerView.adapter = adapter
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        val sharedPrefs = getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+        val email = sharedPrefs.getString("email", null)
 
         if (email != null) {
             getSettingsToFirestore(email)
