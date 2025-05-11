@@ -28,13 +28,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="RGB" />
-    -->
+
             <Button
                 android:id="@+id/btn2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="검증 중지" />
-
+    -->
             <Button
                 android:id="@+id/btn3"
                 android:layout_width="wrap_content"
@@ -54,105 +54,73 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="8dp"
-        android:layout_gravity="bottom|end">
+        android:padding="5dp"
+        android:layout_marginBottom="5dp"
+        android:layout_gravity="bottom|center">
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:gravity="center">
 
             <!-- 타이틀 -->
             <TextView
                 android:id="@+id/result_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="측정 결과"
+                android:text="검증 결과"
                 android:textColor="#0066FF"
                 android:textStyle="bold"
-                android:textSize="16sp"
-                android:layout_marginBottom="8dp" />
+                android:textSize="25sp"
+                android:layout_marginBottom="4dp" />
 
-<!--            <GridLayout
+            <GridLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:columnCount="2"
-                android:rowCount="2"
                 android:useDefaultMargins="true">
 
-                <LinearLayout
-                    android:orientation="vertical"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
+                <TextView
+                    android:text="기준 길이: "
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
 
-                    <TextView
-                        android:text="길이"
-                        android:textSize="12sp"
-                        android:textColor="#888888" />
+                <TextView
+                    android:id="@+id/length_value"
+                    android:text=" -- mm"
+                    android:textStyle="bold"
+                    android:textSize="20sp" />
 
-                    <TextView
-                        android:id="@+id/length_value"
-                        android:text="50.2 mm"
-                        android:textStyle="bold"
-                        android:textSize="16sp" />
-                </LinearLayout>
 
-                <LinearLayout
-                    android:orientation="vertical"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
+                <TextView
+                    android:text="측정 길이: "
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
 
-                    <TextView
-                        android:text="너비"
-                        android:textSize="12sp"
-                        android:textColor="#888888" />
+                <TextView
+                    android:id="@+id/real_length_value"
+                    android:text=" -- mm"
+                    android:textStyle="bold"
+                    android:textSize="20sp" />
 
-                    <TextView
-                        android:id="@+id/width_value"
-                        android:text="25.4 mm"
-                        android:textStyle="bold"
-                        android:textSize="16sp" />
-                </LinearLayout>
 
-                <LinearLayout
-                    android:orientation="vertical"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
+                <TextView
+                    android:text="판  정"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:layout_gravity="center"
+                    android:textColor="#388E3C" />
 
-                    <TextView
-                        android:text="두께"
-                        android:textSize="12sp"
-                        android:textColor="#888888" />
+                <TextView
+                    android:id="@+id/judgement_value"
+                    android:text="--"
+                    android:textStyle="bold"
+                    android:textSize="30sp"
+                    android:layout_gravity="center"
+                    android:textColor="#388E3C" />
 
-                    <TextView
-                        android:id="@+id/thickness_value"
-                        android:text="3.1 mm"
-                        android:textStyle="bold"
-                        android:textSize="16sp" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:orientation="vertical"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="#E0F7E9"
-                    android:padding="4dp"
-                    android:layout_marginTop="4dp"
-                    android:layout_marginBottom="4dp">
-
-                    <TextView
-                        android:text="판정"
-                        android:textSize="12sp"
-                        android:textColor="#388E3C" />
-
-                    <TextView
-                        android:id="@+id/judgement_value"
-                        android:text="양품"
-                        android:textStyle="bold"
-                        android:textSize="16sp"
-                        android:textColor="#388E3C" />
-                </LinearLayout>
             </GridLayout>
--->
+
 
         </LinearLayout>
     </LinearLayout>

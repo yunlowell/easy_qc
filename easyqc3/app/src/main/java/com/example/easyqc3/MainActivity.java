@@ -11,6 +11,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.opencv.android.CameraActivity;
@@ -86,16 +87,28 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
     private Button btnCANNY;
     private Button btnCameraCalibration;
 
+    private TextView tvLengthValue;
+    private TextView tvRealLengthValue;
+    private TextView tvJudgement_value;
+
     // 사각형 추적 변수
     private RotatedRect trackedRect = null;
-    private static final double TRACK_DIST_THRESH = 80.0;       // 추적 허용 거리
-    private static final double TRACK_SIZE_RATIO = 0.3;         // 추적 허용 크기비율
+    private static final double TRACK_DIST_THRESH = 80.0;       // 추적 허용 센터거리 pixel
+    private static final double TRACK_SIZE_RATIO = 0.1;         // 추적 허용 크기비율
 
     private double[] mScaleH_pixelPerMM = new double[]{0.0, 0.0};   // 세로 스케일 (px/mm)
     private double[] mScaleW_pixelPerMM = new double[]{0.0, 0.0};   // 가로 스케일 (px/mm)
 
+    private int[] mScaleInCount = new int[]{0, 0};   // 가로 세로 스케일 적합 횟수 (px/mm)
+
+
     // 사용자가 터치한 커스텀 중심 좌표
     private Point customCenter = null;
+
+
+    private Double mDBreferenceLength = 0.0;
+    private Double mDBtolerance = 0.0;
+    private String mDBunit = "mm";
 
     // JNI 함수 (특징점 검출용)
     public native void FindFeatures(long matAddrGr, long matAddrRgba);
@@ -134,23 +147,21 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
         mOpenCvCameraView.setOnTouchListener(this);
 
         // 버튼 이벤트 설정
-        btnGRAY = findViewById(R.id.btn2);
-        btnGRAY.setOnClickListener(v -> {
-            mDetectAble = false;
-
-            //테스트 코드 email기반으로 Firestore에서 설정값을 불러오기 /////////////
-            SharedPreferences sharedPrefs = getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
-            String email = sharedPrefs.getString("email", null);
-            Log.d("StandardActivity", "onCreate에서 불러온 user_email: " + email);
-
-            getSettingsFromFirestore(email);
-            /// //////////////////////////////////////////////////////////////
-
-        });
+        //btnGRAY = findViewById(R.id.btn2);
+        //btnGRAY.setOnClickListener(v -> {
+        //    mDetectAble = false;
+        //});
 
         btnCANNY = findViewById(R.id.btn3);
         btnCANNY.setOnClickListener(v -> {
-            mDetectAble = true;
+            if(mDetectAble){
+                btnCANNY.setText("검증 시작");
+                mDetectAble = false;
+            }
+            else {
+                btnCANNY.setText("검증 중지");
+                mDetectAble = true;
+            }
             trackedRect = null;
         });
 
@@ -159,6 +170,12 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
             startActivity(new Intent(this, CameraCalibrationActivity.class));
             //btnCameraCalibration.setEnabled(false);     //한번 동작하면 비활성화 하도록 수정.
         });
+
+        // 기준값 update용
+        tvLengthValue = findViewById(R.id.length_value);
+        tvRealLengthValue = findViewById(R.id.real_length_value);
+        tvJudgement_value = findViewById(R.id.judgement_value);
+
     }
 
     /** 메뉴 생성 */
@@ -199,6 +216,12 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
         boolean enabled = prefs.getBoolean("calibration_button_enabled", true);
 
         btnCameraCalibration.setEnabled(enabled);
+
+        //테스트 코드 email기반으로 Firestore에서 설정값을 불러오기 /////////////
+        SharedPreferences sharedPrefs = getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
+        String email = sharedPrefs.getString("email", null);
+        getSettingsFromFirestore(email);
+        /// //////////////////////////////////////////////////////////////ㅁ
 
     }
 
@@ -254,7 +277,7 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
 
                 // 마커 감지
                 detector.detectMarkers(gray, corners, ids);
-                Log.i("Aruco", "감지된 마커 수: " + ids.rows());
+                //Log.i("Aruco", "감지된 마커 수: " + ids.rows());
 
                 Imgproc.Canny(inputFrame.gray(), mIntermediateMat, 80.0, 100.0);
                 Imgproc.cvtColor(mIntermediateMat, mRgba, Imgproc.COLOR_GRAY2RGBA, 4);
@@ -411,7 +434,7 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
             }
 
             Point ptDraw = new Point(
-                bestTracked.center.x - avgWidth/2, bestTracked.center.y + avgHeight/2 + 20
+                bestTracked.center.x - avgWidth/2, bestTracked.center.y + avgHeight/2 + 30
             );
 
             // 텍스트로 mm 단위 치수 출력
@@ -419,7 +442,7 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
                     outputRgbaMat,
                     String.format("%.1fmm x %.1fmm", widthMM, heightMM),
                     ptDraw,  //bestTracked.center,
-                    Imgproc.FONT_HERSHEY_SIMPLEX, 0.6,
+                    Imgproc.FONT_HERSHEY_SIMPLEX, 0.7,
                     new Scalar(0, 255, 0), 2
             );
         }
@@ -518,53 +541,6 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
         }
     }
 
-
-    /**
-     * 가장 큰 윤곽선을 선택해 사각형을 검출하고 치수를 mm 단위로 측정하여 화면에 출력
-     */
-    private void detectAndMeasureRectangle(Mat edgeMat, Mat outputRgbaMat, double pixelPerMM) {
-        List<MatOfPoint> contours = new ArrayList<>();
-        Mat hierarchy = new Mat();
-        Imgproc.findContours(edgeMat.clone(), contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
-
-        double maxArea = 0.0;
-        MatOfPoint biggest = null;
-
-        // 면적이 가장 큰 윤곽선 선택
-        for (MatOfPoint contour : contours) {
-            double area = Imgproc.contourArea(contour);
-            if (area > maxArea) {
-                maxArea = area;
-                biggest = contour;
-            }
-        }
-
-        if (biggest != null) {
-            RotatedRect box = Imgproc.minAreaRect(new MatOfPoint2f(biggest.toArray()));
-            Size size = box.size;
-            double widthMM = size.width / pixelPerMM;
-            double heightMM = size.height / pixelPerMM;
-
-            // 사각형 외곽선 그리기 (초록색)
-            Point[] points = new Point[4];
-            box.points(points);
-            for (int i = 0; i < 4; i++) {
-                Imgproc.line(outputRgbaMat, points[i], points[(i + 1) % 4], new Scalar(0, 255, 0), 2);
-            }
-
-            // 측정 결과 출력
-            Imgproc.putText(
-                    outputRgbaMat,
-                    String.format("%.1fmm x %.1fmm", widthMM, heightMM),
-                    box.center,
-                    Imgproc.FONT_HERSHEY_SIMPLEX, 0.8,
-                    new Scalar(0, 255, 0), 2
-            );
-        }
-    }
-
-
-
     // 추가적으로 필요한 기능이 있다면 이곳에 작성 가능합니다.
     // 예: 측정값 로깅, 사각형 ID 부여, 스냅샷 저장, 서버 전송 등
 
@@ -598,7 +574,7 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
     }
 
     // ArUco 기반 카메라 보정 및 포즈 추정 기반 실측 측정 코드 추가
-// 카메라 내부 행렬 및 왜곡 계수 (보정된 파일에서 로드)
+    // 카메라 내부 행렬 및 왜곡 계수 (보정된 파일에서 로드)
     private Mat cameraMatrix = new Mat();
     private Mat distCoeffs = new Mat();
     private ArucoDetector detector = new ArucoDetector();
@@ -663,10 +639,12 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
                 mScaleH_pixelPerMM[i] = avgHeight / arucoMarkerLengthMM;
 
                 Scalar fontColor = null;
-                if (mScaleW_pixelPerMM[i] -mScaleH_pixelPerMM[i] <= 0.01 && mScaleW_pixelPerMM[i] -mScaleH_pixelPerMM[i] >= -0.01) {
+                if (mScaleW_pixelPerMM[i] -mScaleH_pixelPerMM[i] <= 0.02 && mScaleW_pixelPerMM[i] -mScaleH_pixelPerMM[i] >= -0.02) {
                     fontColor = new Scalar(0, 255, 0);
+                    mScaleInCount[i] += 1;
                 } else {
                     fontColor = new Scalar(255, 0, 0);
+                    mScaleInCount[i] = 0;
                 }
 
                 Imgproc.putText(inputMat, String.format("No.%d scale(px/mm) W:%.2f , H:%.2f ", i+1, mScaleW_pixelPerMM[i], mScaleH_pixelPerMM[i]),
@@ -679,7 +657,6 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
     /*
     data 가져오는 함수
      */
-
     private void getSettingsFromFirestore(String email) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -689,17 +666,17 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                        Double referenceLength = document.getDouble("referenceLength");
-                        Double tolerance = document.getDouble("tolerance");
-                        String unit = document.getString("unit");
+                        mDBreferenceLength = document.getDouble("referenceLength");
+                        mDBtolerance = document.getDouble("tolerance");
+                        mDBunit = document.getString("unit");
 
-                        Log.d("Firestore", "측정값: " + referenceLength + " " + unit + ", 허용 오차: " + tolerance);
+                        tvLengthValue.setText(String.format(" %.2f %s", mDBreferenceLength, mDBunit));
+                        Log.d("Firestore", "기준값: " + mDBreferenceLength + " " + mDBunit + ", 허용 오차: " + mDBtolerance);
                     }
                 })
                 .addOnFailureListener(e -> {
-                    Log.e("Firestore", "데이터 가져오기 실패: ", e);
+                    Log.e("Firestore", "데이터 가져오기 실패: " + e.getMessage(), e);
                 });
     }
-
 
 }
