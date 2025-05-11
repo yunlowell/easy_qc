@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.icu.text.SimpleDateFormat;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -40,6 +42,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+
 
 // DB관련
 import com.example.easyqc3.model.HistoryItem;
@@ -100,7 +103,7 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
     // 사각형 추적 변수
     private RotatedRect trackedRect = null;
     private static final double TRACK_DIST_THRESH = 80.0;       // 추적 허용 센터거리 pixel
-    private static final double TRACK_SIZE_RATIO = 0.1;         // 추적 허용 크기비율
+    private static final double TRACK_SIZE_RATIO = 0.3;         // 추적 허용 크기비율 0.3->30%
 
     private final double[] mScaleH_pixelPerMM = new double[]{0.0, 0.0};   // 세로 스케일 (px/mm)
     private final double[] mScaleW_pixelPerMM = new double[]{0.0, 0.0};   // 가로 스케일 (px/mm)
@@ -113,9 +116,14 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
     private Point customCenter = null;
 
 
+    //openCV CameraFrame Thread에서 UI변경 호출할때 사용.
+    private Handler mHandler = new Handler(Looper.getMainLooper());
+
+    private double mRealwidthMM = 0.0;  // 실제 측정된 길이
     private Double mDBreferenceLength = 0.0;
     private Double mDBtolerance = 0.0;
     private String mDBunit = "mm";
+    private String mEmail = null;   // user email
 
     // JNI 함수 (특징점 검출용)
     public native void FindFeatures(long matAddrGr, long matAddrRgba);
@@ -138,7 +146,7 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
 
         // user 계정 불러오기
         SharedPreferences sharedPrefs = getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
-        String email = sharedPrefs.getString("email", null);
+        mEmail = sharedPrefs.getString("email", null);
 
         // OpenCV 초기화 실패 시 앱 종료
         if (!OpenCVLoader.initLocal()) {
@@ -162,7 +170,7 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
         btnGRAY = findViewById(R.id.btn2);
         btnGRAY.setOnClickListener(v -> {
             //mDetectAble = false;
-                    saveDataToFirestore(email, 30.1, "okay", mDBreferenceLength, mDBtolerance, mDBunit);
+                    saveDataToFirestore(mEmail, 30.1, "okay", mDBreferenceLength, mDBtolerance, mDBunit);
 
         });
 
@@ -174,9 +182,9 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
             }
             else {
                 btnCANNY.setText("검증 중지");
-                mDetectAble = true;
                 findViewById(R.id.result_all_Layout).setVisibility(View.VISIBLE);
                 resetResult();
+                mDetectAble = true;
             }
             trackedRect = null;
         });
@@ -477,9 +485,14 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
                     new Scalar(0, 255, 0), 2
             );
 
+            mRealwidthMM = widthMM;
+
             // 가로 측정치를 UI에 표시하고, 판정기준에 부함할때 판정치를 UI에 표시
             if (mDetectAble)
-                showConfirmedResult( widthMM );         //이것 때문에 자주 죽네... 방법 검토 필요함.
+                mHandler.post(() -> {
+                    showConfirmedResult( mRealwidthMM );  //이것 때문에 자주 죽네... 방법 검토 필요함.
+                });
+
         }
     }
 
@@ -731,9 +744,12 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
         //Aruco마커 2개의 가로세로 스케일이 적합하고, Tracking이 성공한 경우에만 결과를 판단한다.
         if( mScaleInCount[0]>10 && mScaleInCount[1]>10 && mTrackingSuccessCount>1) {
 
+            mScaleInCount[0] = mScaleInCount[1] = mTrackingSuccessCount = 0; // 초기화
+
             //검증 종료를 한다.
-            mDetectAble = false;
-            btnCANNY.setText("검증 시작");
+            //mDetectAble = false;
+            //btnCANNY.setText("검증 시작");
+            btnCANNY.callOnClick();
 
             // 기준값 update용
             tvRealLengthValue.setText(String.format(" %.2f %s", widthMM, mDBunit));
@@ -748,11 +764,13 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
                 tvJudgement_value.setTextColor(getResources().getColor(R.color.green));
 
                 //양품으로 history 저장.
+                saveDataToFirestore(mEmail, widthMM, "okay", mDBreferenceLength, mDBtolerance, mDBunit);
             } else {
-                tvJudgement_value.setText("NG");
+                tvJudgement_value.setText("Fail");
                 tvJudgement_value.setTextColor(getResources().getColor(R.color.red));
 
                 //불량으로 history 저장.
+                saveDataToFirestore(mEmail, widthMM, "fail", mDBreferenceLength, mDBtolerance, mDBunit);
             }
 
 
