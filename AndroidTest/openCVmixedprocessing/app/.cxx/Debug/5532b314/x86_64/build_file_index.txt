@@ -1,1 +1,0 @@
-E:\Work\Git\EasyQC\easy_qc\AndroidTest\openCVmixedprocessing\app\src\main\cpp\CMakeLists.txt
