@@ -6,7 +6,7 @@
 ### backend Server sourcecode
 - backend
 
-### 랜딩 페이지
+### 랜딩 페이지 sourcecode
 - front
 
 
