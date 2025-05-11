@@ -89,7 +89,7 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
     private boolean mDrawTouchCircle = false;
 
     // UI 버튼들
-    //private Button btnGRAY;
+    private Button btnGRAY;
     private Button btnCANNY;
     private Button btnCameraCalibration;
 
@@ -126,6 +126,7 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
     }
 
     /** 액티비티 생성 시 호출 */
+    @SuppressLint("MissingInflatedId")
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -134,6 +135,10 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
         //calibration 버튼 활성화
         SharedPreferences prefs = getSharedPreferences("prefs", MODE_PRIVATE);
         prefs.edit().putBoolean("calibration_button_enabled", true).apply();
+
+        // user 계정 불러오기
+        SharedPreferences sharedPrefs = getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
+        String email = sharedPrefs.getString("email", null);
 
         // OpenCV 초기화 실패 시 앱 종료
         if (!OpenCVLoader.initLocal()) {
@@ -154,10 +159,12 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
         mOpenCvCameraView.setOnTouchListener(this);
 
         // 버튼 이벤트 설정
-        //btnGRAY = findViewById(R.id.btn2);
-        //btnGRAY.setOnClickListener(v -> {
-        //    mDetectAble = false;
-        //});
+        btnGRAY = findViewById(R.id.btn2);
+        btnGRAY.setOnClickListener(v -> {
+            //mDetectAble = false;
+                    saveDataToFirestore(email, 30.1, "okay", mDBreferenceLength, mDBtolerance, mDBunit);
+
+        });
 
         btnCANNY = findViewById(R.id.btn3);
         btnCANNY.setOnClickListener(v -> {
@@ -753,33 +760,36 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
         }
     }
 
-    private void saveDataToFirestore(String email, MeasurementSetting setting) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-        String currentDateTime = sdf.format(new Date());
+    private void saveDataToFirestore(
+            String email,
+            double measuredValue,
+            String result,
+            double mDBreferenceLength,
+            double mDBtolerance,
+            String mDBunit
+    ) {
+        String currentDateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
 
         // HistoryItem 객체 생성
         HistoryItem historyItem = new HistoryItem(
-                setting.getReferenceLength(),
-                setting.getTolerance(),
-                setting.getUnit(),
-                0.0, // measuredValue 저장
-                "test", // result 저장
+                mDBreferenceLength,
+                mDBtolerance,
+                mDBunit,
+                measuredValue,
+                result,
                 email,
                 currentDateTime
         );
 
+        // Firestore에 저장
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("users")
                 .document(email)
                 .collection("measurements")
                 .document(currentDateTime)
                 .set(historyItem)
-                .addOnSuccessListener(aVoid -> {
-                    Log.d("StandardActivity", "데이터 저장 성공!");
-                })
-                .addOnFailureListener(e -> {
-                    Log.e("StandardActivity", "데이터 저장 실패: " + e);
-                });
+                .addOnSuccessListener(aVoid -> Log.d("StandardActivity", "데이터 저장 성공!"))
+                .addOnFailureListener(e -> Log.e("StandardActivity", "데이터 저장 실패: " + e));
     }
 
 }
