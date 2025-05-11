@@ -1,0 +1,1 @@
+E:\Work\Git\EasyQC\easy_qc\AndroidTest\openCVmixedprocessing\app\build\intermediates\cxx\Debug\5532b314\obj\x86

@@ -1,0 +1,27 @@
+{
+  "buildFiles": [
+    "E:\\Work\\Git\\EasyQC\\easy_qc\\AndroidTest\\openCVmixedprocessing\\app\\src\\main\\cpp\\CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "C:\\Users\\khcha\\AppData\\Local\\Android\\Sdk\\cmake\\3.22.1\\bin\\ninja.exe",
+      "-C",
+      "E:\\Work\\Git\\EasyQC\\easy_qc\\AndroidTest\\openCVmixedprocessing\\app\\.cxx\\Debug\\5532b314\\x86",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "C:\\Users\\khcha\\AppData\\Local\\Android\\Sdk\\cmake\\3.22.1\\bin\\ninja.exe",
+    "-C",
+    "E:\\Work\\Git\\EasyQC\\easy_qc\\AndroidTest\\openCVmixedprocessing\\app\\.cxx\\Debug\\5532b314\\x86",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {
+    "opencvmixedprocessing::@6890427a1f51a3e7e1df": {
+      "artifactName": "opencvmixedprocessing",
+      "abi": "x86",
+      "output": "E:\\Work\\Git\\EasyQC\\easy_qc\\AndroidTest\\openCVmixedprocessing\\app\\build\\intermediates\\cxx\\Debug\\5532b314\\obj\\x86\\libopencvmixedprocessing.so",
+      "runtimeFiles": []
+    }
+  }
+}
