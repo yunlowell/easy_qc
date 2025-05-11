@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.icu.text.SimpleDateFormat;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -36,9 +37,13 @@ import org.opencv.objdetect.ArucoDetector;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 // DB관련
+import com.example.easyqc3.model.HistoryItem;
+import com.example.easyqc3.model.MeasurementSetting;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -748,5 +753,33 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
         }
     }
 
+    private void saveDataToFirestore(String email, MeasurementSetting setting) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        String currentDateTime = sdf.format(new Date());
+
+        // HistoryItem 객체 생성
+        HistoryItem historyItem = new HistoryItem(
+                setting.getReferenceLength(),
+                setting.getTolerance(),
+                setting.getUnit(),
+                0.0, // measuredValue 저장
+                "test", // result 저장
+                email,
+                currentDateTime
+        );
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("users")
+                .document(email)
+                .collection("measurements")
+                .document(currentDateTime)
+                .set(historyItem)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("StandardActivity", "데이터 저장 성공!");
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("StandardActivity", "데이터 저장 실패: " + e);
+                });
+    }
 
 }
