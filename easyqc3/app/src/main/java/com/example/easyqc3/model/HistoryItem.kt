@@ -7,8 +7,7 @@ data class HistoryItem(
     val measuredValue: Double = 0.0,
     val result: String = "test",
     val userId: String = "test",
-    val measurementDateTime: String = "",
-    //val imageThumbnail: String = "test"
+    val measurementDateTime: String = ""
 )
 
 data class MeasurementSetting(
