@@ -3,134 +3,188 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+    android:background="@color/deepwhite"
     android:orientation="vertical"
+    android:id="@+id/main"
+    android:backgroundTint="@color/white"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".HomeActivity"
-    android:padding="20dp">
+    tools:context=".HomeActivity">
+
+    <FrameLayout
+        android:id="@+id/frameLayout"
+        android:layout_width="match_parent"
+        android:layout_height="330dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:backgroundTint="@color/deepblue"
+            android:background="@drawable/background">
+        </ImageView>
+
+        <TextView
+            android:id="@+id/hello_ID"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="안녕하세요."
+            android:paddingLeft="30dp"
+            android:paddingTop="60dp"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold"></TextView>
 
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_marginTop="100dp"
-            android:layout_height="150dp">
+            android:layout_height="match_parent">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="20dp">
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.5"></androidx.constraintlayout.widget.Guideline>
+
+            <ImageView
+                android:id="@+id/mainboard"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="200dp"
+                android:background="@drawable/mainboard"
+                android:scaleType="fitXY"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.933">
 
-                <androidx.constraintlayout.widget.Guideline
-                    android:id="@+id/guideline"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    app:layout_constraintGuide_percent="0.5"></androidx.constraintlayout.widget.Guideline>
+            </ImageView>
 
-                <ImageView
-                    android:id="@+id/imageView"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:scaleType="fitXY"
-                    android:src="@drawable/select_box"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.0"></ImageView>
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|center_horizontal"
+                android:fontFamily="sans-serif"
+                android:text="오늘의 결과"
+                android:textColor="@android:color/black"
+                android:textSize="23sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.402" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="top|center_horizontal"
-                    android:fontFamily="sans-serif"
-                    android:text="오늘의 결과"
-                    android:textColor="@android:color/black"
-                    android:textSize="23sp"
-                    android:textStyle="bold"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.109" />
+            <TextView
+                android:id="@+id/goodProductTextiew"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif"
+                android:text=" 양품: "
+                android:textColor="@android:color/black"
+                android:textSize="21sp"
+                android:textStyle="bold"
 
-                <TextView
-                    android:id="@+id/goodProductTextiew"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif"
-                    android:text=" 양품: "
-                    android:textColor="@android:color/black"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    app:layout_constraintBottom_toBottomOf="@+id/imageView"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.111"
-                    app:layout_constraintStart_toStartOf="@+id/imageView"
-                    app:layout_constraintTop_toTopOf="@+id/imageView"
-                    app:layout_constraintVertical_bias="0.709" />
+                app:layout_constraintBottom_toBottomOf="@+id/mainboard"
+                app:layout_constraintEnd_toEndOf="@+id/mainboard"
+                app:layout_constraintHorizontal_bias="0.083"
+                app:layout_constraintStart_toStartOf="@+id/mainboard"
+                app:layout_constraintTop_toBottomOf="@+id/textView"
+                app:layout_constraintVertical_bias="0.487" />
 
-                <TextView
-                    android:id="@+id/goodProductResult"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:fontFamily="sans-serif"
-                    android:text=" -- 건"
-                    android:textColor="@android:color/black"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    app:layout_constraintBottom_toBottomOf="@+id/goodProductTextiew"
-                    app:layout_constraintEnd_toStartOf="@+id/guideline"
-                    app:layout_constraintHorizontal_bias="0.509"
-                    app:layout_constraintStart_toEndOf="@+id/goodProductTextiew"
-                    app:layout_constraintTop_toTopOf="@+id/goodProductTextiew"
-                    app:layout_constraintVertical_bias="0.0" />
+            <TextView
+                android:id="@+id/goodProductResult"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif"
+                android:text=" -- 건"
+                android:textColor="@android:color/black"
+                android:textSize="21sp"
+                android:textStyle="bold"
 
-                <TextView
-                    android:id="@+id/badProductTextiew"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif"
-                    android:text="불량품: "
-                    android:textColor="@android:color/black"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    app:layout_constraintBottom_toBottomOf="@+id/goodProductTextiew"
-                    app:layout_constraintEnd_toEndOf="@+id/imageView"
-                    app:layout_constraintHorizontal_bias="0.126"
-                    app:layout_constraintStart_toStartOf="@+id/guideline"
-                    app:layout_constraintTop_toTopOf="@+id/goodProductTextiew"
-                    app:layout_constraintVertical_bias="0.0" />
+                app:layout_constraintBottom_toBottomOf="@+id/goodProductTextiew"
+                app:layout_constraintEnd_toStartOf="@+id/guideline"
+                app:layout_constraintHorizontal_bias="0.774"
+                app:layout_constraintStart_toEndOf="@+id/goodProductTextiew"
+                app:layout_constraintTop_toTopOf="@+id/goodProductTextiew"
+                app:layout_constraintVertical_bias="0.0" />
 
-                <TextView
-                    android:id="@+id/badProductResult"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
-                    android:fontFamily="sans-serif"
-                    android:text=" -- 건"
-                    android:textColor="@android:color/black"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    app:layout_constraintBottom_toBottomOf="@+id/badProductTextiew"
-                    app:layout_constraintEnd_toEndOf="@+id/imageView"
-                    app:layout_constraintStart_toEndOf="@+id/badProductTextiew"
-                    app:layout_constraintTop_toTopOf="@+id/badProductTextiew" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
+            <TextView
+                android:id="@+id/badProductTextiew"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif"
+                android:text="불량품: "
+                android:textColor="@android:color/black"
+                android:textSize="21sp"
+                android:textStyle="bold"
+
+                app:layout_constraintBottom_toBottomOf="@+id/mainboard"
+                app:layout_constraintEnd_toEndOf="@+id/mainboard"
+                app:layout_constraintHorizontal_bias="0.174"
+                app:layout_constraintStart_toStartOf="@+id/guideline"
+                app:layout_constraintTop_toBottomOf="@+id/textView"
+                app:layout_constraintVertical_bias="0.479" />
+
+            <TextView
+                android:id="@+id/badProductResult"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif"
+                android:text=" -- 건"
+                android:textColor="@android:color/black"
+                android:textSize="21sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="@+id/badProductTextiew"
+                app:layout_constraintEnd_toEndOf="@+id/mainboard"
+                app:layout_constraintHorizontal_bias="0.671"
+                app:layout_constraintStart_toEndOf="@+id/badProductTextiew"
+                app:layout_constraintTop_toTopOf="@+id/badProductTextiew"
+                app:layout_constraintVertical_bias="0.0" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
         </FrameLayout>
-    
+
+    </FrameLayout>
+
     <LinearLayout
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="160dp"
+        android:layout_height="330dp"
+        android:padding="20dp"
         android:gravity="center">
 
         <FrameLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
+            android:layout_height="20dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="계측 활동"
+                android:textSize="16sp"
+                android:textStyle="bold">
+            </TextView>
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
             android:layout_height="130dp"
+            android:paddingTop="10dp"
             android:layout_weight="1">
-                
+
             <ImageView
                 android:id="@+id/gotoMeasuringBtn"
                 android:layout_width="match_parent"
@@ -139,21 +193,38 @@
                 android:scaleType="fitXY"
                 android:clickable="true"
                 android:focusable="true" />
-            <TextView
+
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="계측 시작"
-                android:textColor="@android:color/black"
-                android:textSize="23sp"
-                android:fontFamily="sans-serif"
-                android:textStyle="bold"/>
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/icon_camera"
+                    android:layout_marginEnd="8dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="계측 시작"
+                    android:textColor="@android:color/black"
+                    android:textSize="23sp"
+                    android:fontFamily="sans-serif"
+                    android:textStyle="bold"/>
+            </LinearLayout>
+
         </FrameLayout>
 
         <FrameLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="130dp"
+            android:paddingTop="10dp"
             android:layout_weight="1">
+
             <ImageView
                 android:id="@+id/gotoStandardBtn"
                 android:layout_width="match_parent"
@@ -162,43 +233,76 @@
                 android:scaleType="fitXY"
                 android:clickable="true"
                 android:focusable="true" />
-            <TextView
+
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="계측 기준 설정"
-                android:textColor="@android:color/black"
-                android:textSize="23sp"
-                android:fontFamily="sans-serif"
-                android:textStyle="bold"/>
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/icon_config"
+                    android:layout_marginEnd="8dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="계측 기준 설정"
+                    android:textColor="@android:color/black"
+                    android:textSize="23sp"
+                    android:fontFamily="sans-serif"
+                    android:textStyle="bold"/>
+            </LinearLayout>
+
         </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="130dp"
+            android:paddingTop="10dp"
+            android:layout_weight="1">
+
+            <ImageView
+                android:id="@+id/gotoHistoryBtn"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clickable="true"
+                android:focusable="true"
+                android:scaleType="fitXY"
+                android:src="@drawable/select_box" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ion_list"
+                    android:layout_marginEnd="8dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="검증내역 확인"
+                    android:textColor="@android:color/black"
+                    android:textSize="23sp"
+                    android:fontFamily="sans-serif"
+                    android:textStyle="bold"/>
+            </LinearLayout>
+
+        </FrameLayout>
+
 
     </LinearLayout>
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="130dp">
 
-        <ImageView
-            android:id="@+id/gotoHistoryBtn"
-            android:layout_width="match_parent"
-            android:layout_height="130dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:scaleType="fitXY"
-            android:src="@drawable/select_box" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="검증내역 확인"
-            android:textColor="@android:color/black"
-            android:textSize="23sp"
-            android:fontFamily="sans-serif"
-            android:textStyle="bold"/>
-
-    </FrameLayout>
 
 </LinearLayout>
 
