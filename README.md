@@ -92,6 +92,14 @@
 
 ---
 
+## 디렉토리 설명
+
+* **easyqc3**: android mobile app source
+* **backend**: backend server source
+* **front**: frontend source
+* 기타 폴더 : 시험용으로 작업하던 source
+
+
 ## 🔗 시작하기
 
 1. APK 설치 및 앱 실행
