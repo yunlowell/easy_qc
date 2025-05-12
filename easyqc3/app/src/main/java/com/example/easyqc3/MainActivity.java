@@ -388,17 +388,17 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
         Mat hierarchy = new Mat();
 
         // 외부 윤곽선만 감지
-        Imgproc.findContours(edgeMat.clone(), contours, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
-        if (contours.isEmpty()) return;
+        //Imgproc.findContours(edgeMat.clone(), contours, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+        //if (contours.isEmpty()) return;
 
-        // 외부 + 내부 윤곽선 모두 감지
-        //Imgproc.findContours(edgeMat.clone(), contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
-        //if (contours.isEmpty() || hierarchy.empty()) return;
+        // 외부 + 내부 윤곽선 모두 감지  (외곽선 안에 제품이 있으면 내부 윤곽도 같이 추출하여 검출율을 높여야함.
+        Imgproc.findContours(edgeMat.clone(), contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
+        if (contours.isEmpty() || hierarchy.empty()) return;
 
         // 중심 기준점 설정 (사용자 지정 중심이 없을 경우 화면 중앙)
         Point centerRef = (customCenter != null) ? customCenter : new Point(outputRgbaMat.width() / 2.0, outputRgbaMat.height() / 2.0);
 
-        // 윤곽선으로부터 외접 사각형 추출
+        // 윤곽선으로부터 외접 사각형 추출하여 후보 사각형 리스트에 저장.
         List<RotatedRect> candidates = new ArrayList<>();
 
         // 윤곽선으로부터 후보 사각형 추출
@@ -407,26 +407,31 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
             //int parentIdx = (int) h[3];
 
             double  contourArea = Imgproc.contourArea(contours.get(i));
-            if (contourArea < 400 || contourArea > 90000) continue;  // 작은(20x20) 큰(300x300) 윤곽선은 제외
+            if (contourArea < 900 || contourArea > 90000) continue;  // 작은(30x30) 큰(300x300) 윤곽선은 제외
 
-            //돌기 제거 없이 있는 그대로 모든 윤곽선에 대해 사각형 추출
-            RotatedRect rect = Imgproc.minAreaRect(new MatOfPoint2f(contours.get(i).toArray()));
-            candidates.add(rect);   // 모든 윤곽선에 대해 사각형 추출
+            //돌기 제거해서 검추 하도록 설정
+            boolean bUsedApproxCurve = false;       //true / flase 넣어서 확인.
+            if(bUsedApproxCurve) {
+                //돌기 제거하는 코드 넣으면 제품 추출이 잘 안됨.
+                // 1. contour를 2f 타입으로 변환
+                MatOfPoint2f contour2f = new MatOfPoint2f(contours.get(i).toArray());
 
-            /* 돌기 제거하는 코드 넣으면 제품 추출이 잘 안됨.
-            // 1. contour를 2f 타입으로 변환
-            MatOfPoint2f contour2f = new MatOfPoint2f(contours.get(i).toArray());
+                // 2. 근사 다각형 계산 (0.02는 정밀도 - 필요 시 조절) - 돌기 부분 제거하기
+                MatOfPoint2f approxCurve = new MatOfPoint2f();
+                Imgproc.approxPolyDP(contour2f, approxCurve, 0.02 * Imgproc.arcLength(contour2f, true), true);
 
-            // 2. 근사 다각형 계산 (0.02는 정밀도 - 필요 시 조절) - 돌기 부분 제거하기
-            MatOfPoint2f approxCurve = new MatOfPoint2f();
-            Imgproc.approxPolyDP(contour2f, approxCurve, 0.02 * Imgproc.arcLength(contour2f, true), true);
+                // 3. 꼭짓점이 4개일 때만 사각형으로 간주  모든 contour에 대해 사각형 추출 하도록 수정.
+                if (approxCurve.total() == 4) {
+                    RotatedRect rect = Imgproc.minAreaRect(approxCurve);
+                    candidates.add(rect);   // 모든 윤곽선에 대해 사각형 추출
+            }
 
-            // 3. 꼭짓점이 4개일 때만 사각형으로 간주  모든 contour에 대해 사각형 추출 하도록 수정.
-            //if (approxCurve.total() == 4) {
-                RotatedRect rect = Imgproc.minAreaRect(approxCurve);
+            } else {
+                //돌기 제거 없이 있는 그대로 모든 윤곽선에 대해 사각형 추출
+                RotatedRect rect = Imgproc.minAreaRect(new MatOfPoint2f(contours.get(i).toArray()));
                 candidates.add(rect);   // 모든 윤곽선에 대해 사각형 추출
-            //}
-            */
+            }
+
 
         }
 
@@ -488,11 +493,14 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
             mRealwidthMM = widthMM;
 
             // 가로 측정치를 UI에 표시하고, 판정기준에 부함할때 판정치를 UI에 표시
-            if (mDetectAble)
-                mHandler.post(() -> {
-                    showConfirmedResult( mRealwidthMM );  //이것 때문에 자주 죽네... 방법 검토 필요함.
-                });
-
+            if (mDetectAble) {
+                //Aruco마커 2개의 가로세로 스케일이 적합하고, Tracking이 성공한 경우에만 결과를 판단한다.
+                if (mScaleInCount[0] > 10 && mScaleInCount[1] > 10 && mTrackingSuccessCount > 1) {
+                    mHandler.post(() -> {
+                        showConfirmedResult(mRealwidthMM);  //이것 때문에 자주 죽네... 방법 검토 필요함.
+                    });
+                }
+            }
         }
     }
 
@@ -742,7 +750,7 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
     private void showConfirmedResult(double widthMM) {
 
         //Aruco마커 2개의 가로세로 스케일이 적합하고, Tracking이 성공한 경우에만 결과를 판단한다.
-        if( mScaleInCount[0]>10 && mScaleInCount[1]>10 && mTrackingSuccessCount>1) {
+        //if( mScaleInCount[0]>10 && mScaleInCount[1]>10 && mTrackingSuccessCount>1) {
 
             mScaleInCount[0] = mScaleInCount[1] = mTrackingSuccessCount = 0; // 초기화
 
@@ -757,6 +765,7 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
             // 허용 오차 범위 계산
             double lowerBound = mDBreferenceLength - mDBtolerance;
             double upperBound = mDBreferenceLength + mDBtolerance;
+            String strResult = null;
 
             // 결과 판단 및 텍스트 색상 변경
             if (widthMM >= lowerBound && widthMM <= upperBound) {
@@ -764,18 +773,18 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
                 tvJudgement_value.setTextColor(getResources().getColor(R.color.green));
 
                 //양품으로 history 저장.
-                saveDataToFirestore(mEmail, widthMM, "okay", mDBreferenceLength, mDBtolerance, mDBunit);
+                strResult = "okay";
             } else {
                 tvJudgement_value.setText("Fail");
                 tvJudgement_value.setTextColor(getResources().getColor(R.color.red));
 
                 //불량으로 history 저장.
-                saveDataToFirestore(mEmail, widthMM, "fail", mDBreferenceLength, mDBtolerance, mDBunit);
+                strResult = "fail";
             }
+            saveDataToFirestore(mEmail, widthMM, strResult, mDBreferenceLength, mDBtolerance, mDBunit);
+            Log.d("MainActivity", "판정:" + strResult + "측정값: " + widthMM + " " + mDBunit + ", 기준값: " + mDBreferenceLength + " " + mDBunit + ", 허용 오차: " + mDBtolerance);
 
-
-
-        }
+        //}
     }
 
     private void saveDataToFirestore(
