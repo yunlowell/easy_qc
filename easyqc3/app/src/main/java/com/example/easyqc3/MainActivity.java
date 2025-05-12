@@ -171,8 +171,8 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
         btnGRAY.setOnClickListener(v -> {
             //mDetectAble = false;
                     saveDataToFirestore(mEmail, 30.1, "okay", mDBreferenceLength, mDBtolerance, mDBunit);
-
         });
+        btnGRAY.setVisibility(View.INVISIBLE);  //테스트 기능이라 안보이게 처리.
 
         btnCANNY = findViewById(R.id.btn3);
         btnCANNY.setOnClickListener(v -> {
@@ -308,7 +308,9 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
 
                 Imgproc.Canny(inputFrame.gray(), mIntermediateMat, 80.0, 100.0);
                 Imgproc.cvtColor(mIntermediateMat, mRgba, Imgproc.COLOR_GRAY2RGBA, 4);
-                if (mDetectAble) {
+
+                //검증시작 상태이면서 Aruco 마커가 감지되어야만 검출하도록 처리
+                if (mDetectAble && ids.total() > 0 && corners.size() > 0) {
                     detectAndTrackRectangle2(mIntermediateMat, mRgba);
 
                     if(mDrawTouchCircle) drawTouchFeedback(mRgba);  // 사용자 터치 피드백 그리기
@@ -495,7 +497,7 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
             // 가로 측정치를 UI에 표시하고, 판정기준에 부함할때 판정치를 UI에 표시
             if (mDetectAble) {
                 //Aruco마커 2개의 가로세로 스케일이 적합하고, Tracking이 성공한 경우에만 결과를 판단한다.
-                if (mScaleInCount[0] > 10 && mScaleInCount[1] > 10 && mTrackingSuccessCount > 1) {
+                if (mScaleInCount[0] > 10 && mScaleInCount[1] > 10 && mTrackingSuccessCount > 3) {
                     mHandler.post(() -> {
                         showConfirmedResult(mRealwidthMM);  //이것 때문에 자주 죽네... 방법 검토 필요함.
                     });
