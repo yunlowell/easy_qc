@@ -32,7 +32,7 @@
 
 ### 📱 모바일 앱 (Android)
 
-* 실시간 계측 및 자동 판정 (Edge Detection 기반)
+* 실시간 계측 및 자동 판정 (OpenCV Canny bsaed Edge Detection)
 * 카메라 각도 및 거리 자동 보정
 * Google 로그인 (Firebase Auth)
 * 통계 리포트 화면 제공 (일별/주별/월별 분석)
